@@ -1,6 +1,9 @@
 import csv
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+
+from utils import plot_distribution
 
 # Read the dataset using 'with open'
 with open('./resources/Movie_dataset_cleaned.csv', mode='r', encoding='utf-8-sig') as movieCsv:
@@ -11,7 +14,11 @@ with open('./resources/Movie_dataset_cleaned.csv', mode='r', encoding='utf-8-sig
 df = pd.DataFrame(data)
 
 # Convert numeric columns that might be read as strings
-numeric_columns = ['Year', 'Runtime', 'Budget', 'Worldwide Gross', 'Score', 'Votes']
+numeric_columns = [
+    'Year', 'Runtime', 
+    'Budget', 'Worldwide Gross', 
+    'Score', 'Votes'
+]
 for column in numeric_columns:
     df[column] = pd.to_numeric(df[column], errors='coerce')
 
@@ -20,13 +27,17 @@ df['Decade'] = (df['Year'] // 10) * 10
 df['Recent'] = df['Year'] >= 2010
 
 # Transformations on MPAA (categorical feature)
-ratings = ['G', 'PG', 'PG-13', 'R', 'NC-17', 'Not Rated', 'Unrated', 'X']
+ratings = [
+    'G', 'PG', 'PG-13', 
+    'R', 'NC-17', 'Not Rated', 
+    'Unrated', 'X'
+]
 for rating in ratings:
     df[rating] = (df['MPAA'] == rating).astype(int)
 
 # Transformations on Runtime (using bins)
-bins = [0, 60, 90, 120, np.inf]
-labels = ['<60', '60-90', '90-120', '>120']
+bins = [0, 90, 120, np.inf]
+labels = ['<90', '90-120', '>120']
 df['Runtime_Binned'] = pd.cut(df['Runtime'], bins=bins, labels=labels)
 
 # Transformations on Company, Director, Writer, Main Actor
@@ -46,7 +57,12 @@ df['Top_Main_Actor'] = df['Main Actor'].isin(top_actors)
 df['Log_Budget'] = np.log1p(df['Budget'])
 
 # Transformations on Genre (categorical feature)
-genres = ['Action', 'Adventure', 'Animation', 'Comedy', 'Crime', 'Drama', 'Fantasy', 'Historical', 'Horror', 'Musical', 'Mystery', 'Romance', 'Sci-Fi', 'Thriller', 'War', 'Western']
+genres = [
+    'Action', 'Adventure', 'Animation', 'Comedy', 
+    'Crime', 'Drama', 'Fantasy', 
+    'Horror', 'Mystery', 'Romance', 
+    'Sci-Fi', 'Thriller', 'Western'
+]
 for genre in genres:
     df[genre] = (df['Genre'] == genre).astype(int)
 
@@ -54,15 +70,44 @@ for genre in genres:
 df['Log_Votes'] = np.log1p(df['Votes'])
 df['Weighted_Score'] = df['Score'] * df['Votes']
 
-# Selection of final features
+# Selection of final features and creation of the final dataset (features + target)
 features = [
     'Year', 'Decade', 'Recent', 'Runtime_Binned', 'Top_Company', 'Top_Main_Actor', 
     'Top_Director', 'Top_Writer', 'Log_Budget', 'Weighted_Score', 'Log_Votes'
 ] + ratings + genres
 
-# Creation of the final dataset for the model (features + target)
 final_df = df[features + ['Worldwide Gross']]
-print(final_df.head())
 
 # Save the final dataset to a CSV file
 final_df.to_csv('./resources/Movie_dataset_features.csv', index=False)
+
+
+# Plot a graph showing the distribution of genres across various films
+genre_distribution = df[genres].sum().sort_values()
+plot_distribution(
+    genre_distribution, 
+    'Genre Distribution', 
+    'Genre', 
+    'Occurences', 
+    './plots/stats/genres_distribution.png'
+)
+
+# Plot a graph showing the distribution of ratings across various films
+rating_distribution = df[ratings].sum().sort_values()
+plot_distribution(
+    rating_distribution, 
+    'Rating Distribution', 
+    'Rating', 
+    'Occurences', 
+    './plots/stats/ratings_distribution.png'
+)
+
+# Plot a graph showing the distribution of runtime across various films
+runtime_distribution = df['Runtime_Binned'].value_counts().sort_index()
+plot_distribution(
+    runtime_distribution, 
+    'Runtime Distribution', 
+    'Runtime', 
+    'Occurences', 
+    './plots/stats/runtime_distribution.png'
+)

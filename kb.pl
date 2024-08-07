@@ -6,15 +6,15 @@ genre('Comedy').
 genre('Crime').
 genre('Drama').
 genre('Fantasy').
-genre('Historical').
 genre('Horror').
-genre('Musical').
 genre('Mystery').
 genre('Romance').
 genre('Sci-Fi').
 genre('Thriller').
-genre('War').
 genre('Western').
+# genre('Historical').
+# genre('Musical').
+# genre('War').
 
 % Allowed ratings
 rating('G').
