@@ -1,12 +1,12 @@
 import matplotlib.pyplot as plt
 
-def plot_distribution(data, title, xlabel, ylabel, filename):
+def plot_distribution(data, title, xlabel, ylabel, filename, rotation=45):
     plt.figure(figsize=(7, 10))
     data.plot(kind='bar')
 
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    plt.xticks(rotation=45)
+    plt.xticks(rotation=rotation)
 
     plt.savefig(filename)

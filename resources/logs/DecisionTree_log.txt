@@ -1,0 +1,8 @@
+﻿Best parameters found:
+DecisionTree__criterion            poisson                  
+DecisionTree__max_depth            None                     
+DecisionTree__max_features         sqrt                     
+DecisionTree__min_samples_leaf     8                        
+DecisionTree__min_samples_split    2                        
+DecisionTree__random_state         42                       
+DecisionTree__splitter             best                     

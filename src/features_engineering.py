@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from utils import plot_distribution
 
 # Read the dataset using 'with open'
-with open('./resources/Movie_dataset_cleaned.csv', mode='r', encoding='utf-8-sig') as movieCsv:
+with open('../resources/dataset/Movie_dataset_cleaned.csv', mode='r', encoding='utf-8-sig') as movieCsv:
     reader = csv.DictReader(movieCsv)
     data = list(reader)
 
@@ -40,6 +40,9 @@ bins = [0, 90, 120, np.inf]
 labels = ['<90', '90-120', '>120']
 df['Runtime_Binned'] = pd.cut(df['Runtime'], bins=bins, labels=labels)
 
+ordinal_mapping = {'<90': 0, '90-120': 1, '>120': 2}
+df['Runtime_Encoded'] = df['Runtime_Binned'].map(ordinal_mapping)
+
 # Transformations on Company, Director, Writer, Main Actor
 top_companies = df['Company'].value_counts().nlargest(20).index
 df['Top_Company'] = df['Company'].isin(top_companies)
@@ -66,20 +69,26 @@ genres = [
 for genre in genres:
     df[genre] = (df['Genre'] == genre).astype(int)
 
+# Convert True and False to 1 and 0
+df = df.replace({True: 1, False: 0})
+
 # Transformations on Score and Votes (using log transformation)
 df['Log_Votes'] = np.log1p(df['Votes'])
 df['Weighted_Score'] = df['Score'] * df['Votes']
 
 # Selection of final features and creation of the final dataset (features + target)
 features = [
-    'Year', 'Decade', 'Recent', 'Runtime_Binned', 'Top_Company', 'Top_Main_Actor', 
+    'Year', 'Decade', 'Recent', 'Runtime_Encoded', 'Top_Company', 'Top_Main_Actor', 
     'Top_Director', 'Top_Writer', 'Log_Budget', 'Weighted_Score', 'Log_Votes'
 ] + ratings + genres
 
-final_df = df[features + ['Worldwide Gross']]
+# Approximate the Worldwide Gross by removing the last two digits before the decimal point
+df['Approx_Worldwide_Gross'] = (df['Worldwide Gross'] // 100) * 100
+
+final_df = df[features + ['Approx_Worldwide_Gross']]
 
 # Save the final dataset to a CSV file
-final_df.to_csv('./resources/Movie_dataset_features.csv', index=False)
+final_df.to_csv('../resources/dataset/Movie_dataset_features.csv', index=False)
 
 
 # Plot a graph showing the distribution of genres across various films
@@ -89,7 +98,7 @@ plot_distribution(
     'Genre Distribution', 
     'Genre', 
     'Occurences', 
-    './plots/stats/genres_distribution.png'
+    '../resources/plots/distributions/genres_distribution.png'
 )
 
 # Plot a graph showing the distribution of ratings across various films
@@ -99,7 +108,7 @@ plot_distribution(
     'Rating Distribution', 
     'Rating', 
     'Occurences', 
-    './plots/stats/ratings_distribution.png'
+    '../resources/plots/distributions/ratings_distribution.png'
 )
 
 # Plot a graph showing the distribution of runtime across various films
@@ -109,5 +118,6 @@ plot_distribution(
     'Runtime Distribution', 
     'Runtime', 
     'Occurences', 
-    './plots/stats/runtime_distribution.png'
+    '../resources/plots/distributions/runtime_distribution.png',
+    0
 )

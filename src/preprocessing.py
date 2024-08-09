@@ -2,7 +2,7 @@ import pandas as pd
 import csv
 
 def process_movie_dataset():
-    with open('./resources/Movie_dataset_cleaned.csv', mode='r', encoding='utf-8-sig') as movieCsv:
+    with open('../resources/dataset/Movie_dataset_cleaned.csv', mode='r', encoding='utf-8-sig') as movieCsv:
         reader = csv.DictReader(movieCsv)
 
         # Write the Prolog knowledge base to a file
