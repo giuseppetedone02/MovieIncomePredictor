@@ -2,6 +2,8 @@ import csv
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.discriminant_analysis import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
 
 from utils import plot_distribution
 
@@ -12,6 +14,7 @@ with open('../resources/dataset/Movie_dataset_cleaned.csv', mode='r', encoding='
 
 # Create a DataFrame from 'data'
 df = pd.DataFrame(data)
+df = df.dropna()
 
 # Convert numeric columns that might be read as strings
 numeric_columns = [
@@ -45,19 +48,27 @@ df['Runtime_Encoded'] = df['Runtime_Binned'].map(ordinal_mapping)
 
 # Transformations on Company, Director, Writer, Main Actor
 top_companies = df['Company'].value_counts().nlargest(20).index
-df['Top_Company'] = df['Company'].isin(top_companies)
+df['Top_Company'] = df['Company'].isin(top_companies).astype(int)
 
 top_directors = df['Director'].value_counts().nlargest(20).index
-df['Top_Director'] = df['Director'].isin(top_directors)
+df['Top_Director'] = df['Director'].isin(top_directors).astype(int)
 
 top_writers = df['Writer'].value_counts().nlargest(20).index
-df['Top_Writer'] = df['Writer'].isin(top_writers)
+df['Top_Writer'] = df['Writer'].isin(top_writers).astype(int)
 
 top_actors = df['Main Actor'].value_counts().nlargest(20).index
-df['Top_Main_Actor'] = df['Main Actor'].isin(top_actors)
+df['Top_Main_Actor'] = df['Main Actor'].isin(top_actors).astype(int)
 
 # Transformations on Budget (using log transformation)
-df['Log_Budget'] = np.log1p(df['Budget'])
+# df['Log_Budget'] = np.log1p(df['Budget'])
+
+# Transformations on Budget (using standardization)
+scaler = StandardScaler()
+df['Standardized_Budget'] = scaler.fit_transform(df[['Budget']])
+
+# Apply Min-Max Scaling to Standardized_Budget to avoid negative values
+min_max_scaler = MinMaxScaler()
+df['Scaled_Standardized_Budget'] = min_max_scaler.fit_transform(df[['Standardized_Budget']])
 
 # Transformations on Genre (categorical feature)
 genres = [
@@ -74,18 +85,24 @@ df = df.replace({True: 1, False: 0})
 
 # Transformations on Score and Votes (using log transformation)
 df['Log_Votes'] = np.log1p(df['Votes'])
-df['Weighted_Score'] = df['Score'] * df['Votes']
+min_max_scaler = MinMaxScaler()
+df['Normalized_Score'] = min_max_scaler.fit_transform(df[['Score']])
+
+print(df[['Score', 'Normalized_Score']].describe())
+print(df[['Votes', 'Log_Votes']].describe())
 
 # Selection of final features and creation of the final dataset (features + target)
 features = [
     'Year', 'Decade', 'Recent', 'Runtime_Encoded', 'Top_Company', 'Top_Main_Actor', 
-    'Top_Director', 'Top_Writer', 'Log_Budget', 'Weighted_Score', 'Log_Votes'
+    'Top_Director', 'Top_Writer', 'Scaled_Standardized_Budget', 'Normalized_Score', 'Log_Votes'
 ] + ratings + genres
 
 # Approximate the Worldwide Gross by removing the last two digits before the decimal point
-df['Approx_Worldwide_Gross'] = (df['Worldwide Gross'] // 100) * 100
+df['Worldwide Gross'] = (df['Worldwide Gross'] // 100) * 100
+df['Log_Worldwide_Gross'] = np.log1p(df['Worldwide Gross'])
+print(df[['Worldwide Gross', 'Log_Worldwide_Gross']].describe())
 
-final_df = df[features + ['Approx_Worldwide_Gross']]
+final_df = df[features + ['Log_Worldwide_Gross']]
 
 # Save the final dataset to a CSV file
 final_df.to_csv('../resources/dataset/Movie_dataset_features.csv', index=False)
