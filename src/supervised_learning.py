@@ -1,17 +1,3 @@
-## TO-DO
-# Comprendere i modelli di regressione che utilizzerai
-## Regressione Logistica
-## Alberi di decisione (alberi di regressione)
-## Random Forest (modello composito)
-## Gradient-Boosted Trees (modello composito)
-# Trovare migliori iper-parametri per i vari modelli di regressione
-## K-fold cross validation
-# Eseguire training e testing dei modelli di regressione
-# Valutare i modelli di regressione (selezionando metriche piú appropriate)
-## Discutere su possibile overfitting e underfitting e cause 
-# ? Loss function per la regressione
-# IMPORTANTE: Niente matrice di confusione
-
 import csv
 import numpy as np
 import pandas as pd
