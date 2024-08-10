@@ -1,12 +1,26 @@
+## TO-DO
+# Comprendere i modelli di regressione che utilizzerai
+## LGBMRegressor (modello composito)
+## Alberi di decisione (alberi di regressione)
+## Random Forest (modello composito)
+## Gradient-Boosted Trees (XGB, modello composito)
+# Trovare migliori iper-parametri per i vari modelli di regressione
+## K-fold cross validation
+# Eseguire training e testing dei modelli di regressione
+# Valutare i modelli di regressione (selezionando metriche piú appropriate)
+## Discutere su possibile overfitting e underfitting e cause 
+## Discutere su possibili soluzioni per overfitting e underfitting (Over/Under Sampling, Regularization, Dropout, Early Stopping, etc.)
+# IMPORTANTE: Niente matrice di confusione
+
 import csv
+from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
 from lightgbm import LGBMRegressor
-from sklearn.linear_model import LinearRegression
 from xgboost import XGBRegressor
 
 from sklearn.discriminant_analysis import StandardScaler
-from sklearn.model_selection import GridSearchCV, KFold, RepeatedKFold, StratifiedKFold, cross_validate, train_test_split
+from sklearn.model_selection import GridSearchCV, RepeatedKFold, cross_validate, train_test_split, learning_curve
 from sklearn.pipeline import Pipeline
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
@@ -31,7 +45,56 @@ with open('../resources/dataset/Movie_dataset_features.csv', mode='r', encoding=
 
 # Define the cross-validation strategy and the scorer
 cv = RepeatedKFold(n_splits=3, n_repeats=2, random_state=seed)
-MSE_scorer = make_scorer(mean_squared_error)
+
+def plot_learning_curves(regressionModel, X, y, regressionModelName, logFile):
+    # Calculate the learning curve for the given regression model
+    train_sizes, train_scores, test_scores = learning_curve(
+        regressionModel, 
+        X, y, 
+        cv=cv, 
+        scoring='neg_mean_squared_error', 
+        random_state=seed
+    )
+
+    # Write the learning curve to the log file
+    logFile.write("\n{:<8}{:<25}{:<25}{:<25}{:<25}\n".format(
+        "Size", 
+        "Mean Train Score", 
+        "Variance Train Score", 
+        "Std Train Score", 
+        "Train Scores"
+    ))
+    for i in range(0, len(train_scores)):
+        mean = np.mean(train_scores[i])
+        var = np.var(train_scores[i])
+        std = np.std(train_scores[i])
+        logFile.write("{:<8}{:<25}{:<25}{:<25}{:<25}\n".format(str(i), str(mean), str(var), str(std), str(train_scores[i])))
+    
+    logFile.write("\n{:<8}{:<25}{:<25}{:<25}{:<25}\n".format(
+        "Size", 
+        "Mean Test Score", 
+        "Variance Test Score", 
+        "Std Test Score", 
+        "Test Scores"
+    ))
+    for i in range(0, len(test_scores)):
+        mean = np.mean(test_scores[i])
+        var = np.var(test_scores[i])
+        std = np.std(test_scores[i])
+        logFile.write("{:<8}{:<25}{:<25}{:<25}{:<25}\n".format(str(i), str(mean), str(var), str(std), str(test_scores[i])))
+    
+    # Plot the learning curve
+    mean_train_errors = 1 - np.mean(train_scores, axis=1)
+    mean_test_errors = 1 - np.mean(test_scores, axis=1)
+    plt.figure()
+    plt.plot(train_sizes, mean_train_errors, 'o-', color='r', label='Training Error')
+    plt.plot(train_sizes, mean_test_errors, 'o-', color='g', label='Validation Error')
+    plt.xlabel('Training examples')
+    plt.ylabel('Mean Error')
+    plt.legend(loc='best')
+    plt.title(regressionModelName + ' Learning Curves')
+    plt.savefig('../resources/plots/learning_curve_' + regressionModelName + '.png')
+
 
 def train_and_test_model(regressionModel, hyperParameters, regressionModelName, seed=42):
     with open('../resources/logs/'+ regressionModelName + "_log.txt", mode='w', encoding='utf-8-sig') as logFile:
@@ -76,6 +139,10 @@ def train_and_test_model(regressionModel, hyperParameters, regressionModelName, 
                 std = np.std(scores)
 
                 logFile.write("{:<10}{:<25}{:<25}{:<25}\n".format(metric_name, str(mean), str(var), str(std)))
+
+        # Plot the learning curve
+        plot_learning_curves(clf, X, y, regressionModelName, logFile)
+
 
 DecisionTreeHyperparameters = {
     'DecisionTree__criterion': [
