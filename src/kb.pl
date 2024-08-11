@@ -1,29 +1,3 @@
-% Allowed genres
-genre('Action').
-genre('Adventure').
-genre('Animation').
-genre('Comedy').
-genre('Crime').
-genre('Drama').
-genre('Fantasy').
-genre('Horror').
-genre('Mystery').
-genre('Romance').
-genre('Sci-Fi').
-genre('Thriller').
-genre('Western').
-# genre('Historical').
-# genre('Musical').
-# genre('War').
-
-% Allowed ratings
-rating('G').
-rating('PG').
-rating('PG-13').
-rating('R').
-rating('NC-17').
-
-% Allowed movies
 movie('Transylvania 6-5000', 1985, 'PG', 93, 'Balcor Film Investors', 'Yugoslavia', 'Rudy De Luca', 'Rudy De Luca', 'Jeff Goldblum', 3000000, 7196872.0, 'Comedy', 50.0, 69000.0).
 movie('The Postman Always Rings Twice', 1981, 'R', 122, 'CIP Filmproduktion GmbH', 'West Germany', 'Bob Rafelson', 'David Mamet', 'Jack Nicholson', 12000000, 12376625.0, 'Crime', 66.0, 220000.0).
 movie('The NeverEnding Story', 1984, 'PG', 102, 'Constantin Film', 'West Germany', 'Wolfgang Petersen', 'Wolfgang Petersen', 'Noah Hathaway', 27000000, 20251411.0, 'Adventure', 74.0, 1350000.0).
@@ -5299,17 +5273,3 @@ movie('Knock Off', 1998, 'R', 91, 'Knock Films A.V.V.', 'Aruba', 'Hark Tsui', 'S
 movie('Nine Queens', 2000, 'R', 114, 'FX Sound', 'Argentina', 'Fabián Bielinsky', 'Fabián Bielinsky', 'Ricardo Darín', 1500000, 12413888.0, 'Crime', 79.0, 510000.0).
 movie('Wild Tales', 2014, 'R', 122, 'Kramer & Sigman Films', 'Argentina', 'Damián Szifron', 'Germán Servidio', 'Darío Grandinetti', 3300000, 30642704.0, 'Comedy', 81.0, 1840000.0).
 movie('The Secret in Their Eyes', 2009, 'R', 129, 'Tornasol Films', 'Argentina', 'Juan José Campanella', 'Eduardo Sacheri', 'Ricardo Darín', 2000000, 35079650.0, 'Drama', 82.0, 1980000.0).
-
-% Translation of non-standard ratings to standard ratings
-translate_rating('TV-G', 'G').
-translate_rating('TV-PG', 'PG').
-translate_rating('TV-14', 'PG-13').
-translate_rating('TV-MA', 'R').
-translate_rating(Rating, Rating) :- rating(Rating).  % If the rating is already standard
-
-% Add a movie only if its genres and rating are valid
-add_movie(Title, Year, Rating, Runtime, Company, Country, Director, Writer, MainActor, Budget, WorldwideGross, Genre, Score, Votes) :-
-    genre(Genre),
-    translate_rating(Rating, TranslatedRating),
-    rating(TranslatedRating),
-    assertz(movie(Title, Year, TranslatedRating, Runtime, Company, Country, Director, Writer, MainActor, Budget, WorldwideGross, Genre, Score, Votes)).

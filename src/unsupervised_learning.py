@@ -22,8 +22,8 @@ def elbow_method():
         # Create a KMeans model with k clusters
         model = KMeans(n_clusters=k, n_init=10, init='random')
 
-        # Fit the model to the data
-        model.fit(df)
+        # Fit the model to the Log_BoxOffice column
+        model.fit(df[['Log_BoxOffice']])
 
         # Append the inertia value to the list
         inertia_values.append(model.inertia_)
@@ -35,15 +35,13 @@ def elbow_method():
         direction='decreasing'
     )
 
-    print(kneeLocator.elbow)
-
     # Plot the inertia values
     plt.plot(k_values, inertia_values)
     plt.xlabel('Number of Clusters')
     plt.ylabel('Inertia')
-    plt.title('Elbow Method')
+    plt.title('Elbow Method for Optimal k')
+    plt.savefig('../resources/plots/unsupervised_learning/elbow_method.png')
     plt.show()
-    plt.savefig('../resources/plots/Elbow_Method.png')
 
     # Return the number of clusters
     return kneeLocator.elbow
@@ -52,13 +50,36 @@ def elbow_method():
 def define_cluster():
     clusters = elbow_method()
 
-    # Create a KMeans model with 3 clusters
-    # then fits the model to the data
+    # Create a KMeans model with the optimal number of clusters
+    # then fits the model to the Log_BoxOffice column
     model = KMeans(n_clusters=clusters, n_init=10, init='random')
-    model.fit(df)
+    model.fit(df[['Log_BoxOffice']])
 
     # Add the cluster labels to the DataFrame and save it to a new CSV file
     df['Cluster'] = model.labels_
     df.to_csv('../resources/dataset/Movie_dataset_clusters.csv', index=False)
+    visualize_pie_chart(df)
+
+
+def visualize_pie_chart(dataFrame):
+    cluster_counts = dataFrame['Cluster'].value_counts()
+
+    plt.figure(figsize=(8, 8))
+    wedges, texts, autotexts = plt.pie(
+        cluster_counts, 
+        labels=cluster_counts.index, 
+        autopct='%1.1f%%', 
+        startangle=140, 
+        colors=['#ff9999','#66b3ff','#99ff99','#ffcc99','#c2c2f0']
+    )
+    plt.title('Distribution of Movies in Clusters')
+    plt.legend(
+        wedges, 
+        [f'Cluster {i}' for i in cluster_counts.index], 
+        title="Clusters", 
+        loc="lower left" 
+    )
+    plt.savefig('../resources/plots/unsupervised_learning/clusters_pie_chart.png')
+    plt.show()
 
 define_cluster()

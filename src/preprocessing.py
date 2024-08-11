@@ -14,7 +14,7 @@ def process_movie_dataset():
                 + repr(row['Title']) + ', ' + row['Year'] + ', ' + repr(row['MPAA']) + ', ' 
                 + row['Runtime'] + ', ' + repr(row['Company']) + ', ' + repr(row['Country']) + ', ' 
                 + repr(row['Director']) + ', ' + repr(row['Writer']) + ', ' + repr(row['Main Actor']) + ', ' 
-                + row['Budget'] + ', ' + row['Worldwide Gross'] + ', ' 
+                + row['Budget'] + ', ' + row['BoxOffice'] + ', ' 
                 + repr(row['Genre']) + ', ' + row['Score'] + ', ' + row['Votes'] 
                 + ').\n')
 

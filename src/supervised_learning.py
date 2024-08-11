@@ -32,10 +32,10 @@ with open('../resources/dataset/Movie_dataset_features.csv', mode='r', encoding=
     df = pd.DataFrame(dataset)
 
     # Convert target column to numeric, coercing errors
-    df['Log_Worldwide_Gross'] = pd.to_numeric(df['Log_Worldwide_Gross'], errors='coerce')
+    df['Log_BoxOffice'] = pd.to_numeric(df['Log_BoxOffice'], errors='coerce')
 
-    X = df.drop(columns=['Log_Worldwide_Gross']).to_numpy()
-    y = df['Log_Worldwide_Gross'].to_numpy()
+    X = df.drop(columns=['Log_BoxOffice']).to_numpy()
+    y = df['Log_BoxOffice'].to_numpy()
 
     scaler = StandardScaler()
     scaler.fit(X)
@@ -93,7 +93,7 @@ def plot_learning_curves(regressionModel, X, y, regressionModelName, logFile):
     plt.ylabel('Mean Error')
     plt.legend(loc='best')
     plt.title(regressionModelName + ' Learning Curves')
-    plt.savefig('../resources/plots/learning_curve_' + regressionModelName + '.png')
+    plt.savefig('../resources/plots/learning_curves/learning_curve_' + regressionModelName + '.png')
 
 
 def train_and_test_model(regressionModel, hyperParameters, regressionModelName, seed=42):

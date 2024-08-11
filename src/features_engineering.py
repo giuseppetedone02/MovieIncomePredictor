@@ -19,7 +19,7 @@ df = df.dropna()
 # Convert numeric columns that might be read as strings
 numeric_columns = [
     'Year', 'Runtime', 
-    'Budget', 'Worldwide Gross', 
+    'Budget', 'BoxOffice', 
     'Score', 'Votes'
 ]
 for column in numeric_columns:
@@ -88,21 +88,17 @@ df['Log_Votes'] = np.log1p(df['Votes'])
 min_max_scaler = MinMaxScaler()
 df['Normalized_Score'] = min_max_scaler.fit_transform(df[['Score']])
 
-print(df[['Score', 'Normalized_Score']].describe())
-print(df[['Votes', 'Log_Votes']].describe())
-
 # Selection of final features and creation of the final dataset (features + target)
 features = [
     'Year', 'Decade', 'Recent', 'Runtime_Encoded', 'Top_Company', 'Top_Main_Actor', 
     'Top_Director', 'Top_Writer', 'Scaled_Standardized_Budget', 'Normalized_Score', 'Log_Votes'
 ] + ratings + genres
 
-# Approximate the Worldwide Gross by removing the last two digits before the decimal point
-df['Worldwide Gross'] = (df['Worldwide Gross'] // 100) * 100
-df['Log_Worldwide_Gross'] = np.log1p(df['Worldwide Gross'])
-print(df[['Worldwide Gross', 'Log_Worldwide_Gross']].describe())
+# Approximate the BoxOffice by removing the last two digits before the decimal point
+df['BoxOffice'] = (df['BoxOffice'] // 100) * 100
+df['Log_BoxOffice'] = np.log1p(df['BoxOffice'])
 
-final_df = df[features + ['Log_Worldwide_Gross']]
+final_df = df[features + ['Log_BoxOffice']]
 
 # Save the final dataset to a CSV file
 final_df.to_csv('../resources/dataset/Movie_dataset_features.csv', index=False)
