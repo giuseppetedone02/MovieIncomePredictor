@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 from pgmpy.models import BayesianNetwork
 from pgmpy.inference import VariableElimination
 from pgmpy.estimators import MaximumLikelihoodEstimator, HillClimbSearch, K2Score
-from sklearn.preprocessing import KBinsDiscretizer, MinMaxScaler
+from sklearn.preprocessing import KBinsDiscretizer
 from utils import reduce_categories
 
 
@@ -121,7 +121,7 @@ for col in categorical_columns:
     df[col] = df[col].astype('category')
 
 # Discretize continuous variables
-discretizer = KBinsDiscretizer(encode='ordinal', strategy='uniform')
+discretizer = KBinsDiscretizer(n_bins=10, encode='ordinal', strategy='uniform')
 df['Budget'] = discretizer.fit_transform(df[['Budget']])
 df['Runtime'] = discretizer.fit_transform(df[['Runtime']])
 df['Worldwide Gross'] = discretizer.fit_transform(df[['Worldwide Gross']])
