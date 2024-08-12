@@ -1,4 +1,4 @@
-Year,Decade,Recent,Runtime_Encoded,Top_Company,Top_Main_Actor,Top_Director,Top_Writer,Scaled_Standardized_Budget,Normalized_Score,Log_Votes,G,PG,PG-13,R,NC-17,Not Rated,Unrated,X,Action,Adventure,Animation,Comedy,Crime,Drama,Fantasy,Horror,Mystery,Romance,Sci-Fi,Thriller,Western,Log_BoxOffice,Cluster
+Year,Decade,Recent,Runtime_Encoded,Top_Company,Top_Main_Actor,Top_Director,Top_Writer,Scaled_Standardized_Budget,Normalized_Score,Log_Votes,G,PG,PG-13,R,NC-17,Not Rated,Unrated,X,Action,Adventure,Animation,Comedy,Crime,Drama,Fantasy,Horror,Mystery,Romance,Sci-Fi,Thriller,Western,Log_Worldwide_Gross,Cluster
 1985,1980,0,1,0,0,0,0,0.008410254105406273,0.41891891891891886,11.141876276228,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,15.78914717969777,2
 1981,1980,0,2,0,0,0,1,0.03369157907155737,0.6351351351351351,12.301387370778713,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,16.33131823178834,2
 1984,1980,0,1,0,0,0,0,0.07582712068180923,0.7432432432432432,14.115615891155079,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,16.823734534308823,2
