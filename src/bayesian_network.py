@@ -5,9 +5,11 @@ import pandas as pd
 
 from matplotlib import pyplot as plt
 from pgmpy.models import BayesianNetwork
+from pgmpy.inference import VariableElimination
 from pgmpy.estimators import MaximumLikelihoodEstimator, HillClimbSearch, K2Score
 from sklearn.preprocessing import KBinsDiscretizer, MinMaxScaler
 from utils import reduce_categories
+
 
 # Create a Bayesian Network model
 def create_bayesian_network(dataset):
@@ -42,7 +44,6 @@ def create_bayesian_network(dataset):
 
     return bn
 
-
 # Load the Bayesian Network model
 def load_bayesian_network():
     with open('../resources/bayesian_networks/bayesian_network.pkl', 'rb') as file:
@@ -53,19 +54,9 @@ def load_bayesian_network():
 # Display the Bayesian Network
 def display_bayesian_network(bn: BayesianNetwork):
     G = nx.MultiDiGraph(bn.edges())
-    pos = nx.spring_layout(
-        G, 
-        iterations=100, 
-        k=2,
-        threshold=5, 
-        pos=nx.spiral_layout(G)
-    )
-    nx.draw_networkx_nodes(
-        G, 
-        pos, 
-        node_size=250, 
-        node_color="#ff574c"
-    )
+    pos = nx.spring_layout(G, iterations=100, k=2, threshold=5, pos=nx.spiral_layout(G))
+    
+    nx.draw_networkx_nodes(G, pos, node_size=250, node_color="#ff574c")
     nx.draw_networkx_labels(
         G,
         pos,
@@ -105,7 +96,7 @@ def show_CPD(bn: BayesianNetwork):
 
 # Generate a random example
 def generate_random_example(bn: BayesianNetwork):
-    return bn.simulate(n_samples=1)
+    return bn.simulate(n_samples=1).drop(columns=['Worldwide Gross'], axis=1)
 
 
 # Get the dataset
@@ -130,7 +121,7 @@ for col in categorical_columns:
     df[col] = df[col].astype('category')
 
 # Discretize continuous variables
-discretizer = KBinsDiscretizer(n_bins=10, encode='ordinal', strategy='uniform')
+discretizer = KBinsDiscretizer(encode='ordinal', strategy='uniform')
 df['Budget'] = discretizer.fit_transform(df[['Budget']])
 df['Runtime'] = discretizer.fit_transform(df[['Runtime']])
 df['Worldwide Gross'] = discretizer.fit_transform(df[['Worldwide Gross']])
@@ -146,3 +137,11 @@ bn = create_bayesian_network(df)
 # bn = load_bayesian_network()
 display_bayesian_network(bn)
 show_CPD(bn)
+
+# Generate a random example
+example = generate_random_example(bn)
+print("Example: " + str(example))
+
+inference = VariableElimination(bn)
+result = inference.query(variables=['Worldwide Gross'], evidence=example.iloc[0].to_dict())
+print(result)
