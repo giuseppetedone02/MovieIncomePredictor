@@ -1,13 +1,13 @@
 import csv
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
+
 from sklearn.discriminant_analysis import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
-
 from utils import plot_distribution
 
-# Read the dataset using 'with open'
+
+# Load the dataset
 with open('../resources/dataset/Movie_dataset_cleaned.csv', mode='r', encoding='utf-8-sig') as movieCsv:
     reader = csv.DictReader(movieCsv)
     data = list(reader)
@@ -19,7 +19,7 @@ df = df.dropna()
 # Convert numeric columns that might be read as strings
 numeric_columns = [
     'Year', 'Runtime', 
-    'Budget', 'BoxOffice', 
+    'Budget', 'Worldwide Gross', 
     'Score', 'Votes'
 ]
 for column in numeric_columns:
@@ -48,19 +48,14 @@ df['Runtime_Encoded'] = df['Runtime_Binned'].map(ordinal_mapping)
 
 # Transformations on Company, Director, Writer, Main Actor
 top_companies = df['Company'].value_counts().nlargest(20).index
-df['Top_Company'] = df['Company'].isin(top_companies).astype(int)
-
 top_directors = df['Director'].value_counts().nlargest(20).index
-df['Top_Director'] = df['Director'].isin(top_directors).astype(int)
-
 top_writers = df['Writer'].value_counts().nlargest(20).index
-df['Top_Writer'] = df['Writer'].isin(top_writers).astype(int)
-
 top_actors = df['Main Actor'].value_counts().nlargest(20).index
-df['Top_Main_Actor'] = df['Main Actor'].isin(top_actors).astype(int)
 
-# Transformations on Budget (using log transformation)
-# df['Log_Budget'] = np.log1p(df['Budget'])
+df['Top_Company'] = df['Company'].isin(top_companies).astype(int)
+df['Top_Director'] = df['Director'].isin(top_directors).astype(int)
+df['Top_Writer'] = df['Writer'].isin(top_writers).astype(int)
+df['Top_Main_Actor'] = df['Main Actor'].isin(top_actors).astype(int)
 
 # Transformations on Budget (using standardization)
 scaler = StandardScaler()
@@ -94,17 +89,18 @@ features = [
     'Top_Director', 'Top_Writer', 'Scaled_Standardized_Budget', 'Normalized_Score', 'Log_Votes'
 ] + ratings + genres
 
-# Approximate the BoxOffice by removing the last two digits before the decimal point
-df['BoxOffice'] = (df['BoxOffice'] // 100) * 100
-df['Log_BoxOffice'] = np.log1p(df['BoxOffice'])
+# Approximate the Worldwide Gross by removing the last two digits before the decimal point
+df['Worldwide Gross'] = (df['Worldwide Gross'] // 100) * 100
+df['Log_Worldwide_Gross'] = np.log1p(df['Worldwide Gross'])
 
-final_df = df[features + ['Log_BoxOffice']]
+final_df = df[features + ['Log_Worldwide_Gross']]
 
 # Save the final dataset to a CSV file
 final_df.to_csv('../resources/dataset/Movie_dataset_features.csv', index=False)
 
 
-# Plot a graph showing the distribution of genres across various films
+# Plot a graph showing the distribution of 
+# genres, ratings and runtime across various films
 genre_distribution = df[genres].sum().sort_values()
 plot_distribution(
     genre_distribution, 
@@ -114,7 +110,6 @@ plot_distribution(
     '../resources/plots/distributions/genres_distribution.png'
 )
 
-# Plot a graph showing the distribution of ratings across various films
 rating_distribution = df[ratings].sum().sort_values()
 plot_distribution(
     rating_distribution, 
@@ -124,7 +119,6 @@ plot_distribution(
     '../resources/plots/distributions/ratings_distribution.png'
 )
 
-# Plot a graph showing the distribution of runtime across various films
 runtime_distribution = df['Runtime_Binned'].value_counts().sort_index()
 plot_distribution(
     runtime_distribution, 

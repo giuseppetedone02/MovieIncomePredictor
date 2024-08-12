@@ -1,5 +1,6 @@
-import pandas as pd
 import csv
+import pandas as pd
+
 
 def process_movie_dataset():
     with open('../resources/dataset/Movie_dataset_cleaned.csv', mode='r', encoding='utf-8-sig') as movieCsv:
@@ -14,7 +15,7 @@ def process_movie_dataset():
                 + repr(row['Title']) + ', ' + row['Year'] + ', ' + repr(row['MPAA']) + ', ' 
                 + row['Runtime'] + ', ' + repr(row['Company']) + ', ' + repr(row['Country']) + ', ' 
                 + repr(row['Director']) + ', ' + repr(row['Writer']) + ', ' + repr(row['Main Actor']) + ', ' 
-                + row['Budget'] + ', ' + row['BoxOffice'] + ', ' 
+                + row['Budget'] + ', ' + row['Worldwide Gross'] + ', ' 
                 + repr(row['Genre']) + ', ' + row['Score'] + ', ' + row['Votes'] 
                 + ').\n')
 

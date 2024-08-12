@@ -5,6 +5,8 @@ from matplotlib import pyplot as plt
 from sklearn.cluster import KMeans
 from kneed import KneeLocator
 
+
+# Load the dataset
 with open('../resources/dataset/Movie_dataset_features.csv', mode='r', encoding='utf-8-sig') as movieCsv:
     reader = csv.DictReader(movieCsv)
     dataset = list(reader)
@@ -22,12 +24,13 @@ def elbow_method():
         # Create a KMeans model with k clusters
         model = KMeans(n_clusters=k, n_init=10, init='random')
 
-        # Fit the model to the Log_BoxOffice column
-        model.fit(df[['Log_BoxOffice']])
+        # Fit the model to the Log_Worldwide_Gross column
+        model.fit(df[['Log_Worldwide_Gross']])
 
         # Append the inertia value to the list
         inertia_values.append(model.inertia_)
 
+    # Create a KneeLocator object to find the optimal k value
     kneeLocator = KneeLocator(
         k_values, 
         inertia_values, 
@@ -51,9 +54,9 @@ def define_cluster():
     clusters = elbow_method()
 
     # Create a KMeans model with the optimal number of clusters
-    # then fits the model to the Log_BoxOffice column
+    # then fits the model to the Log_Worldwide_Gross column
     model = KMeans(n_clusters=clusters, n_init=10, init='random')
-    model.fit(df[['Log_BoxOffice']])
+    model.fit(df[['Log_Worldwide_Gross']])
 
     # Add the cluster labels to the DataFrame and save it to a new CSV file
     df['Cluster'] = model.labels_
@@ -61,6 +64,7 @@ def define_cluster():
     visualize_pie_chart(df)
 
 
+# Display a pie chart of the distribution of movies in clusters
 def visualize_pie_chart(dataFrame):
     cluster_counts = dataFrame['Cluster'].value_counts()
 

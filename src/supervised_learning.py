@@ -1,24 +1,10 @@
-## TO-DO
-# Comprendere i modelli di regressione che utilizzerai
-## LGBMRegressor (modello composito)
-## Alberi di decisione (alberi di regressione)
-## Random Forest (modello composito)
-## Gradient-Boosted Trees (XGB, modello composito)
-# Trovare migliori iper-parametri per i vari modelli di regressione
-## K-fold cross validation
-# Eseguire training e testing dei modelli di regressione
-# Valutare i modelli di regressione (selezionando metriche piú appropriate)
-## Discutere su possibile overfitting e underfitting e cause 
-## Discutere su possibili soluzioni per overfitting e underfitting (Over/Under Sampling, Regularization, Dropout, Early Stopping, etc.)
-# IMPORTANTE: Niente matrice di confusione
-
 import csv
 from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
+
 from lightgbm import LGBMRegressor
 from xgboost import XGBRegressor
-
 from sklearn.discriminant_analysis import StandardScaler
 from sklearn.model_selection import GridSearchCV, RepeatedKFold, cross_validate, train_test_split, learning_curve
 from sklearn.pipeline import Pipeline
@@ -26,16 +12,18 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import make_scorer, mean_squared_error, mean_absolute_error, mean_squared_log_error, r2_score
 
+
+# Load the dataset
 with open('../resources/dataset/Movie_dataset_features.csv', mode='r', encoding='utf-8-sig') as movieCsv:
     reader = csv.DictReader(movieCsv)
     dataset = list(reader)
     df = pd.DataFrame(dataset)
 
     # Convert target column to numeric, coercing errors
-    df['Log_BoxOffice'] = pd.to_numeric(df['Log_BoxOffice'], errors='coerce')
+    df['Log_Worldwide_Gross'] = pd.to_numeric(df['Log_Worldwide_Gross'], errors='coerce')
 
-    X = df.drop(columns=['Log_BoxOffice']).to_numpy()
-    y = df['Log_BoxOffice'].to_numpy()
+    X = df.drop(columns=['Log_Worldwide_Gross']).to_numpy()
+    y = df['Log_Worldwide_Gross'].to_numpy()
 
     scaler = StandardScaler()
     scaler.fit(X)
