@@ -25,9 +25,11 @@ numeric_columns = [
 for column in numeric_columns:
     df[column] = pd.to_numeric(df[column], errors='coerce')
 
+
 # Transformations on Year (using decade and recent flag)
 df['Decade'] = (df['Year'] // 10) * 10
 df['Recent'] = df['Year'] >= 2010
+
 
 # Transformations on MPAA (categorical feature)
 ratings = [
@@ -38,6 +40,7 @@ ratings = [
 for rating in ratings:
     df[rating] = (df['MPAA'] == rating).astype(int)
 
+
 # Transformations on Runtime (using bins)
 bins = [0, 90, 120, np.inf]
 labels = ['<90', '90-120', '>120']
@@ -45,6 +48,7 @@ df['Runtime_Binned'] = pd.cut(df['Runtime'], bins=bins, labels=labels)
 
 ordinal_mapping = {'<90': 0, '90-120': 1, '>120': 2}
 df['Runtime_Encoded'] = df['Runtime_Binned'].map(ordinal_mapping)
+
 
 # Transformations on Company, Director, Writer, Main Actor
 top_companies = df['Company'].value_counts().nlargest(20).index
@@ -57,6 +61,7 @@ df['Top_Director'] = df['Director'].isin(top_directors).astype(int)
 df['Top_Writer'] = df['Writer'].isin(top_writers).astype(int)
 df['Top_Main_Actor'] = df['Main Actor'].isin(top_actors).astype(int)
 
+
 # Transformations on Budget (using standardization)
 scaler = StandardScaler()
 df['Standardized_Budget'] = scaler.fit_transform(df[['Budget']])
@@ -64,6 +69,7 @@ df['Standardized_Budget'] = scaler.fit_transform(df[['Budget']])
 # Apply Min-Max Scaling to Standardized_Budget to avoid negative values
 min_max_scaler = MinMaxScaler()
 df['Scaled_Standardized_Budget'] = min_max_scaler.fit_transform(df[['Standardized_Budget']])
+
 
 # Transformations on Genre (categorical feature)
 genres = [
@@ -75,8 +81,14 @@ genres = [
 for genre in genres:
     df[genre] = (df['Genre'] == genre).astype(int)
 
+
+# Transformations on True and False values
+# Imposta l'opzione per evitare il downcasting silenzioso
+pd.set_option('future.no_silent_downcasting', True)
+
 # Convert True and False to 1 and 0
-df = df.replace({True: 1, False: 0})
+df = df.replace({True: 1, False: 0}).infer_objects(copy=False)
+
 
 # Transformations on Score and Votes (using log transformation)
 df['Log_Votes'] = np.log1p(df['Votes'])
@@ -94,6 +106,10 @@ df['Worldwide Gross'] = (df['Worldwide Gross'] // 100) * 100
 df['Log_Worldwide_Gross'] = np.log1p(df['Worldwide Gross'])
 
 final_df = df[features + ['Log_Worldwide_Gross']]
+
+# Convert every column to numeric (for oversampling purposes)
+for column in final_df.columns:
+    final_df.loc[:, column] = pd.to_numeric(final_df[column], errors='coerce')
 
 # Save the final dataset to a CSV file
 final_df.to_csv('../resources/dataset/Movie_dataset_features.csv', index=False)

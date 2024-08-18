@@ -1,8 +1,8 @@
 import csv
-from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
 
+from matplotlib import pyplot as plt
 from lightgbm import LGBMRegressor
 from xgboost import XGBRegressor
 from sklearn.discriminant_analysis import StandardScaler
@@ -11,6 +11,8 @@ from sklearn.pipeline import Pipeline
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import make_scorer, mean_squared_error, mean_absolute_error, mean_squared_log_error, r2_score
+
+from oversampling import random_oversampling, smote_oversampling
 
 
 # Load the dataset
@@ -34,7 +36,7 @@ with open('../resources/dataset/Movie_dataset_features.csv', mode='r', encoding=
 # Define the cross-validation strategy and the scorer
 cv = RepeatedKFold(n_splits=3, n_repeats=2, random_state=seed)
 
-def plot_learning_curves(regressionModel, X, y, regressionModelName, logFile):
+def plot_learning_curves(regressionModel, X, y, regressionModelName, logFile, oversamplingName=""):
     # Calculate the learning curve for the given regression model
     train_sizes, train_scores, test_scores = learning_curve(
         regressionModel, 
@@ -80,14 +82,19 @@ def plot_learning_curves(regressionModel, X, y, regressionModelName, logFile):
     plt.xlabel('Training examples')
     plt.ylabel('Mean Error')
     plt.legend(loc='best')
-    plt.title(regressionModelName + ' Learning Curves')
-    plt.savefig('../resources/plots/learning_curves/learning_curve_' + regressionModelName + '.png')
+    plt.title(regressionModelName + oversamplingName + ' Learning Curves')
+    plt.savefig('../resources/plots/learning_curves/learning_curve_' + regressionModelName + oversamplingName + '.png')
 
 
-def train_and_test_model(regressionModel, hyperParameters, regressionModelName, seed=42):
-    with open('../resources/logs/'+ regressionModelName + "_log.txt", mode='w', encoding='utf-8-sig') as logFile:
+def train_and_test_model(regressionModel, hyperParameters, regressionModelName, seed, oversampling_method=None, oversamplingName=""):
+    with open('../resources/logs/log_'+ regressionModelName + oversamplingName + ".txt", mode='w', encoding='utf-8-sig') as logFile:
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=seed)
         
+        # Apply the oversampling technique if it is provided
+        if oversampling_method:
+            df_train_resampled = oversampling_method(df, target='Log_Worldwide_Gross')
+            X_train = df_train_resampled.drop('Log_Worldwide_Gross', axis=1)
+            y_train = df_train_resampled['Log_Worldwide_Gross']
 
         # Perform the grid search to find the best 
         # hyperparameters of the regression model
@@ -129,7 +136,7 @@ def train_and_test_model(regressionModel, hyperParameters, regressionModelName, 
                 logFile.write("{:<10}{:<25}{:<25}{:<25}\n".format(metric_name, str(mean), str(var), str(std)))
 
         # Plot the learning curve
-        plot_learning_curves(clf, X, y, regressionModelName, logFile)
+        plot_learning_curves(clf, X, y, regressionModelName, logFile, oversamplingName)
 
 
 DecisionTreeHyperparameters = {
@@ -176,7 +183,32 @@ XGBRegressorHyperparameters = {
     'XGBRegressor__random_state': [seed]
 }
 
-train_and_test_model(DecisionTreeRegressor(), DecisionTreeHyperparameters, 'DecisionTree', seed)
-train_and_test_model(RandomForestRegressor(), RandomForestHyperparameters, 'RandomForest', seed)
-train_and_test_model(LGBMRegressor(), LGBMRegressorHyperparameters, 'LGBMRegressor', seed)
-train_and_test_model(XGBRegressor(), XGBRegressorHyperparameters, 'XGBRegressor', seed)
+models_and_hyperparameters = [
+    (DecisionTreeRegressor(), DecisionTreeHyperparameters, 'DecisionTree'),
+    (RandomForestRegressor(), RandomForestHyperparameters, 'RandomForest'),
+    (LGBMRegressor(), LGBMRegressorHyperparameters, 'LGBMRegressor'),
+    (XGBRegressor(), XGBRegressorHyperparameters, 'XGBRegressor')
+]
+
+# Iteration over models without oversampling
+for regressionModel, hyperParameters, regressionModelName in models_and_hyperparameters:
+    train_and_test_model(
+        regressionModel, hyperParameters, 
+        regressionModelName, seed
+    )
+
+# # Iteration over models with random oversampling
+for regressionModel, hyperParameters, regressionModelName in models_and_hyperparameters:
+    train_and_test_model(
+        regressionModel, hyperParameters, regressionModelName, 
+        seed, oversampling_method=random_oversampling, 
+        oversamplingName="_RandomOverSampler"
+    )
+
+# Iteration over models with SMOTE oversampling
+for regressionModel, hyperParameters, regressionModelName in models_and_hyperparameters:
+    train_and_test_model(
+        regressionModel, hyperParameters, regressionModelName, 
+        seed, oversampling_method=smote_oversampling, 
+        oversamplingName="_SMOTE"
+    )

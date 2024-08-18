@@ -7,3 +7,4 @@ xgboost
 plot
 kneed
 pgmpy
+imbalanced-learn

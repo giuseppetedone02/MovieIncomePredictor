@@ -76,7 +76,7 @@ def visualize_pie_chart(dataFrame):
         startangle=140, 
         colors=['#ff9999','#66b3ff','#99ff99','#ffcc99','#c2c2f0']
     )
-    plt.title('Distribution of Movies in Clusters')
+    plt.title('Distribution of Movies in Clusters (Based on Worldwide Gross)')
     plt.legend(
         wedges, 
         [f'Cluster {i}' for i in cluster_counts.index], 
