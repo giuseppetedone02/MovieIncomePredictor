@@ -1,42 +1,27 @@
 import csv
 import numpy as np
 import pandas as pd
+from sklearn.preprocessing import KBinsDiscretizer
+import smogn
 
 from matplotlib import pyplot as plt
 from lightgbm import LGBMRegressor
 from xgboost import XGBRegressor
+from imblearn.pipeline import Pipeline
+
 from sklearn.discriminant_analysis import StandardScaler
 from sklearn.model_selection import GridSearchCV, RepeatedKFold, cross_validate, train_test_split, learning_curve
-from sklearn.pipeline import Pipeline
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import make_scorer, mean_squared_error, mean_absolute_error, mean_squared_log_error, r2_score
+from imblearn.over_sampling import SMOTE, ADASYN
 
-from oversampling import random_oversampling, smote_oversampling
+from oversampling import RandomOverSamplerTransformer, smogn_resample_data
 
 
-# Load the dataset
-with open('../resources/dataset/Movie_dataset_features.csv', mode='r', encoding='utf-8-sig') as movieCsv:
-    reader = csv.DictReader(movieCsv)
-    dataset = list(reader)
-    df = pd.DataFrame(dataset)
-
-    # Convert target column to numeric, coercing errors
-    df['Log_Worldwide_Gross'] = pd.to_numeric(df['Log_Worldwide_Gross'], errors='coerce')
-
-    X = df.drop(columns=['Log_Worldwide_Gross']).to_numpy()
-    y = df['Log_Worldwide_Gross'].to_numpy()
-
-    scaler = StandardScaler()
-    scaler.fit(X)
-    X = scaler.transform(X)
-
-    seed = 42
-
-# Define the cross-validation strategy and the scorer
-cv = RepeatedKFold(n_splits=3, n_repeats=2, random_state=seed)
-
-def plot_learning_curves(regressionModel, X, y, regressionModelName, logFile, oversamplingName=""):
+def plot_learning_curves(
+        regressionModel, X, y, regressionModelName, 
+        logFile, oversamplingName):
     # Calculate the learning curve for the given regression model
     train_sizes, train_scores, test_scores = learning_curve(
         regressionModel, 
@@ -86,27 +71,40 @@ def plot_learning_curves(regressionModel, X, y, regressionModelName, logFile, ov
     plt.savefig('../resources/plots/learning_curves/learning_curve_' + regressionModelName + oversamplingName + '.png')
 
 
-def train_and_test_model(regressionModel, hyperParameters, regressionModelName, seed, oversampling_method=None, oversamplingName=""):
+def train_and_test_model(
+        targetColumn, regressionModel, hyperParameters, 
+        regressionModelName, seed, oversamplingName, pre_pipeline=[]):
     with open('../resources/logs/log_'+ regressionModelName + oversamplingName + ".txt", mode='w', encoding='utf-8-sig') as logFile:
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=seed)
+        X = df.drop(columns=[targetColumn]).to_numpy()
+        y = df[targetColumn].to_numpy()
+
+        scaler = StandardScaler()
+        scaler.fit(X)
+        X = scaler.transform(X)
         
-        # Apply the oversampling technique if it is provided
-        if oversampling_method:
-            df_train_resampled = oversampling_method(df, target='Log_Worldwide_Gross')
-            X_train = df_train_resampled.drop('Log_Worldwide_Gross', axis=1)
-            y_train = df_train_resampled['Log_Worldwide_Gross']
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=seed)
+
+        # Apply SMOGN if specified in the pipeline
+        if oversamplingName == '_SMOGN':
+            X_train, y_train = smogn_resample_data(X_train, y_train, targetColumn)
+            
 
         # Perform the grid search to find the best 
         # hyperparameters of the regression model
+        pipeline = Pipeline(pre_pipeline + [(regressionModelName, regressionModel)])
+
+        print('Iniziata la grid search con pipeline: ', pipeline)
         gridSearchCV = GridSearchCV(
-            Pipeline([(regressionModelName, regressionModel)]), 
+            pipeline,
             param_grid = hyperParameters, 
             cv = cv, 
             n_jobs = -1,
             scoring = 'neg_mean_squared_error',
             error_score='raise'
         )
+        print('===FINE GRID')
         gridSearchCV.fit(X_train, y_train)
+        print('=================================================Fine Fit')
 
         # Write the results to the log file
         logFile.write("Best parameters found:\n")
@@ -137,6 +135,23 @@ def train_and_test_model(regressionModel, hyperParameters, regressionModelName, 
 
         # Plot the learning curve
         plot_learning_curves(clf, X, y, regressionModelName, logFile, oversamplingName)
+
+
+# Load the dataset
+with open('../resources/dataset/Movie_dataset_features.csv', mode='r', encoding='utf-8-sig') as movieCsv:
+    reader = csv.DictReader(movieCsv)
+    dataset = list(reader)
+    df = pd.DataFrame(dataset)
+
+    targetColumn = 'Log_Worldwide_Gross'
+
+    # Convert target column to numeric, coercing errors
+    df[targetColumn] = pd.to_numeric(df[targetColumn], errors='coerce')
+
+    seed = 42
+
+# Define the cross-validation strategy and the scorer
+cv = RepeatedKFold(n_splits=3, n_repeats=2, random_state=seed)
 
 
 DecisionTreeHyperparameters = {
@@ -183,32 +198,31 @@ XGBRegressorHyperparameters = {
     'XGBRegressor__random_state': [seed]
 }
 
-models_and_hyperparameters = [
-    (DecisionTreeRegressor(), DecisionTreeHyperparameters, 'DecisionTree'),
-    (RandomForestRegressor(), RandomForestHyperparameters, 'RandomForest'),
-    (LGBMRegressor(), LGBMRegressorHyperparameters, 'LGBMRegressor'),
-    (XGBRegressor(), XGBRegressorHyperparameters, 'XGBRegressor')
+
+# Iterations with and without oversampling
+ros_transformer = RandomOverSamplerTransformer()
+smote = SMOTE(sampling_strategy="not majority", random_state=42, k_neighbors=5)
+
+# Define the pre-pipeline oversampling strategies
+pre_pipeline_oversampling = [
+    [],
+    [('SMOGN', None)],
+    # [('RandomOverSamplerTransformer', ros_transformer), ('SMOTE', smote)],
 ]
 
-# Iteration over models without oversampling
-for regressionModel, hyperParameters, regressionModelName in models_and_hyperparameters:
-    train_and_test_model(
-        regressionModel, hyperParameters, 
-        regressionModelName, seed
-    )
+models_and_hyperparameters = [
+    (DecisionTreeRegressor(), DecisionTreeHyperparameters, 'DecisionTree'),
+#     (RandomForestRegressor(), RandomForestHyperparameters, 'RandomForest'),
+#     (LGBMRegressor(), LGBMRegressorHyperparameters, 'LGBMRegressor'),
+#     (XGBRegressor(), XGBRegressorHyperparameters, 'XGBRegressor')
+]
 
-# # Iteration over models with random oversampling
-for regressionModel, hyperParameters, regressionModelName in models_and_hyperparameters:
-    train_and_test_model(
-        regressionModel, hyperParameters, regressionModelName, 
-        seed, oversampling_method=random_oversampling, 
-        oversamplingName="_RandomOverSampler"
-    )
-
-# Iteration over models with SMOTE oversampling
-for regressionModel, hyperParameters, regressionModelName in models_and_hyperparameters:
-    train_and_test_model(
-        regressionModel, hyperParameters, regressionModelName, 
-        seed, oversampling_method=smote_oversampling, 
-        oversamplingName="_SMOTE"
-    )
+for pipe in pre_pipeline_oversampling:
+    for regressionModel, hyperParameters, regressionModelName in models_and_hyperparameters:
+        oversamplingName = '_' + pipe[-1][0] if len(pipe) > 0 else ''
+        
+        train_and_test_model(
+            targetColumn, regressionModel, 
+            hyperParameters, regressionModelName, 
+            seed, oversamplingName, pre_pipeline=pipe
+        )

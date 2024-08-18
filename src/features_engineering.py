@@ -107,10 +107,6 @@ df['Log_Worldwide_Gross'] = np.log1p(df['Worldwide Gross'])
 
 final_df = df[features + ['Log_Worldwide_Gross']]
 
-# Convert every column to numeric (for oversampling purposes)
-for column in final_df.columns:
-    final_df.loc[:, column] = pd.to_numeric(final_df[column], errors='coerce')
-
 # Save the final dataset to a CSV file
 final_df.to_csv('../resources/dataset/Movie_dataset_features.csv', index=False)
 
