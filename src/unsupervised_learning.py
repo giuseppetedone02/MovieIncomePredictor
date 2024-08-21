@@ -1,13 +1,13 @@
 import csv
 import numpy as np
 import pandas as pd
+from sklearn.metrics import silhouette_score
 import smogn
-import ImbalancedLearningRegression as iblr
+import seaborn as sns
 
 from matplotlib import pyplot as plt
 from sklearn.cluster import KMeans
 from kneed import KneeLocator
-from sklearn.discriminant_analysis import StandardScaler
 
 from oversampling import smogn_resample_data
 
@@ -95,10 +95,7 @@ def visualize_pie_chart(dataFrame, features, titlePrefix='', suffix=''):
 
 
 # Load the dataset
-with open('../resources/dataset/Movie_dataset_features.csv', mode='r', encoding='utf-8-sig') as movieCsv:
-    reader = csv.DictReader(movieCsv)
-    dataset = list(reader)
-    df = pd.DataFrame(dataset)
+df = pd.read_csv('../resources/dataset/Movie_dataset_features.csv', encoding='utf-8-sig')
 
 features = [
     'Runtime_Encoded', 'Director_Num_Movies', 'Writer_Num_Movies', 'Main_Actor_Num_Movies', 'Scaled_Standardized_Budget', 
@@ -106,3 +103,11 @@ features = [
     'Crime', 'Drama', 'Fantasy', 'Horror', 'Mystery', 'Romance', 'Sci-Fi', 'Thriller', 'Western'
 ]
 clusters, centroids = define_cluster(df, features)
+
+# Calculate and print the silhouette score
+sil_score = silhouette_score(df[features], clusters)
+print(f'Silhouette Score: {sil_score}')
+
+# Calculate mean and median of features for each cluster
+cluster_stats = df.groupby('Cluster')[features].agg(['mean', 'median'])
+print(cluster_stats)

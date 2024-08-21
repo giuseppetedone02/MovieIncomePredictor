@@ -59,9 +59,11 @@ def plot_learning_curves(
         std = np.std(test_scores[i])
         logFile.write("{:<8}{:<25}{:<25}{:<25}{:<25}\n".format(str(i), str(mean), str(var), str(std), str(test_scores[i])))
     
+    # Converts the negative mean squared error to a positive mean error
+    mean_train_errors = np.mean(-train_scores, axis=1)
+    mean_test_errors = np.mean(-test_scores, axis=1)
+
     # Plot the learning curve
-    mean_train_errors = 1 - np.mean(train_scores, axis=1)
-    mean_test_errors = 1 - np.mean(test_scores, axis=1)
     plt.figure()
     plt.plot(train_sizes, mean_train_errors, 'o-', color='r', label='Training Error')
     plt.plot(train_sizes, mean_test_errors, 'o-', color='g', label='Validation Error')
@@ -76,9 +78,6 @@ def train_and_test_model(
         targetColumn, regressionModel, hyperParameters, 
         regressionModelName, seed, suffix, pre_pipeline=[]):
     with open(f'../resources/logs/log_{regressionModelName}{suffix}.txt', mode='w', encoding='utf-8-sig') as logFile:
-        if suffix == '_IBLR':
-            df = iblr_ro
-        
         X = df.drop(columns=[targetColumn]).to_numpy()
         y = df[targetColumn].to_numpy()
 
@@ -138,21 +137,18 @@ def train_and_test_model(
         plot_learning_curves(clf, X, y, regressionModelName, logFile, suffix)
 
 
+
 # Load the dataset
-with open('../resources/dataset/Movie_dataset_features.csv', mode='r', encoding='utf-8-sig') as movieCsv:
-    reader = csv.DictReader(movieCsv)
-    dataset = list(reader)
-    df = pd.DataFrame(dataset)
+df = pd.read_csv('../resources/dataset/Movie_dataset_features.csv', encoding='utf-8-sig')
 
-    targetColumn = 'Log_Worldwide_Gross'
+# Convert target column to numeric, coercing errors
+targetColumn = 'Log_Worldwide_Gross'
+df[targetColumn] = pd.to_numeric(df[targetColumn], errors='coerce')
 
-    # Convert target column to numeric, coercing errors
-    df[targetColumn] = pd.to_numeric(df[targetColumn], errors='coerce')
-
-    seed = 42
+seed = 42
 
 # Define the cross-validation strategy and the scorer
-cv = RepeatedKFold(n_splits=3, n_repeats=2, random_state=seed)
+cv = RepeatedKFold(n_splits=5, n_repeats=2, random_state=seed)
 
 
 DecisionTreeHyperparameters = {
@@ -175,7 +171,6 @@ RandomForestHyperparameters = {
         'friedman_mse', 'poisson'
     ],
     'RandomForest__max_depth': [None, 10, 20, 40],
-    'RandomForest__class_weight': [None, 'balanced'],
     # 'RandomForest__max_features': ['sqrt', 'log2'],
     'RandomForest__random_state': [seed]
 }
@@ -197,7 +192,7 @@ XGBRegressorHyperparameters = {
     # 'XGBRegressor__max_leaves': [31, 127],
     # 'XGBRegressor__class_weight': [None, 'balanced'],
     'XGBRegressor__lambda': [0.01, 0.1, 0.5],
-    'XGBRegressor__verbose': [0],
+    'XGBRegressor__verbosity': [0],
     'XGBRegressor__random_state': [seed]
 }
 
@@ -215,9 +210,9 @@ pre_pipeline_oversampling = [
 
 models_and_hyperparameters = [
     (DecisionTreeRegressor(), DecisionTreeHyperparameters, 'DecisionTree'),
-    # (RandomForestRegressor(), RandomForestHyperparameters, 'RandomForest'),
-    # (LGBMRegressor(), LGBMRegressorHyperparameters, 'LGBMRegressor'),
-    # (XGBRegressor(), XGBRegressorHyperparameters, 'XGBRegressor')
+    (RandomForestRegressor(), RandomForestHyperparameters, 'RandomForest'),
+    (LGBMRegressor(), LGBMRegressorHyperparameters, 'LGBMRegressor'),
+    (XGBRegressor(), XGBRegressorHyperparameters, 'XGBRegressor')
 ]
 
 for pipe in pre_pipeline_oversampling:

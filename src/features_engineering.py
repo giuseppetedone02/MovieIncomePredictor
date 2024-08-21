@@ -8,12 +8,7 @@ from utils import plot_distribution
 
 
 # Load the dataset
-with open('../resources/dataset/Movie_dataset_cleaned.csv', mode='r', encoding='utf-8-sig') as movieCsv:
-    reader = csv.DictReader(movieCsv)
-    data = list(reader)
-
-# Create a DataFrame from 'data'
-df = pd.DataFrame(data)
+df = pd.read_csv('../resources/dataset/Movie_dataset_cleaned.csv', encoding='utf-8-sig')
 df = df.dropna()
 
 # Convert numeric columns that might be read as strings

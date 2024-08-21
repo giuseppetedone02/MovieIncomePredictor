@@ -100,11 +100,7 @@ def generate_random_example(bn: BayesianNetwork):
 
 
 # Get the dataset
-with open('../resources/dataset/Movie_dataset_cleaned.csv', mode='r', encoding='utf-8-sig') as movieCsv:
-    reader = csv.DictReader(movieCsv)
-    dataset = list(reader)
-    df = pd.DataFrame(dataset)
-
+df = pd.read_csv('../resources/dataset/Movie_dataset_cleaned.csv', encoding='utf-8-sig')
 df.drop(columns=['Title'], axis=1, inplace=True)
 
 # Pre-process the data
