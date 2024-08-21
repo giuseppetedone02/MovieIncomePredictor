@@ -14,14 +14,14 @@ from sklearn.model_selection import GridSearchCV, RepeatedKFold, cross_validate,
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import make_scorer, mean_squared_error, mean_absolute_error, mean_squared_log_error, r2_score
-from imblearn.over_sampling import SMOTE, ADASYN
+from imblearn.over_sampling import SMOTE
 
 from oversampling import RandomOverSamplerTransformer, smogn_resample_data
 
 
 def plot_learning_curves(
         regressionModel, X, y, regressionModelName, 
-        logFile, oversamplingName):
+        logFile, suffix):
     # Calculate the learning curve for the given regression model
     train_sizes, train_scores, test_scores = learning_curve(
         regressionModel, 
@@ -67,14 +67,14 @@ def plot_learning_curves(
     plt.xlabel('Training examples')
     plt.ylabel('Mean Error')
     plt.legend(loc='best')
-    plt.title(regressionModelName + oversamplingName + ' Learning Curves')
-    plt.savefig('../resources/plots/learning_curves/learning_curve_' + regressionModelName + oversamplingName + '.png')
+    plt.title(regressionModelName + suffix + ' Learning Curves')
+    plt.savefig(f'../resources/plots/learning_curves/learning_curve_{regressionModelName}{suffix}.png')
 
 
 def train_and_test_model(
         targetColumn, regressionModel, hyperParameters, 
-        regressionModelName, seed, oversamplingName, pre_pipeline=[]):
-    with open('../resources/logs/log_'+ regressionModelName + oversamplingName + ".txt", mode='w', encoding='utf-8-sig') as logFile:
+        regressionModelName, seed, suffix, pre_pipeline=[]):
+    with open(f'../resources/logs/log_{regressionModelName}{suffix}.txt', mode='w', encoding='utf-8-sig') as logFile:
         X = df.drop(columns=[targetColumn]).to_numpy()
         y = df[targetColumn].to_numpy()
 
@@ -85,7 +85,7 @@ def train_and_test_model(
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=seed)
 
         # Apply SMOGN if specified in the pipeline
-        if oversamplingName == '_SMOGN':
+        if suffix == '_SMOGN':
             X_train, y_train = smogn_resample_data(X_train, y_train, targetColumn)
             
 
@@ -93,7 +93,6 @@ def train_and_test_model(
         # hyperparameters of the regression model
         pipeline = Pipeline(pre_pipeline + [(regressionModelName, regressionModel)])
 
-        print('Iniziata la grid search con pipeline: ', pipeline)
         gridSearchCV = GridSearchCV(
             pipeline,
             param_grid = hyperParameters, 
@@ -102,9 +101,7 @@ def train_and_test_model(
             scoring = 'neg_mean_squared_error',
             error_score='raise'
         )
-        print('===FINE GRID')
         gridSearchCV.fit(X_train, y_train)
-        print('=================================================Fine Fit')
 
         # Write the results to the log file
         logFile.write("Best parameters found:\n")
@@ -134,7 +131,7 @@ def train_and_test_model(
                 logFile.write("{:<10}{:<25}{:<25}{:<25}\n".format(metric_name, str(mean), str(var), str(std)))
 
         # Plot the learning curve
-        plot_learning_curves(clf, X, y, regressionModelName, logFile, oversamplingName)
+        plot_learning_curves(clf, X, y, regressionModelName, logFile, suffix)
 
 
 # Load the dataset
@@ -159,70 +156,72 @@ DecisionTreeHyperparameters = {
         'squared_error', 'friedman_mse', 
         'absolute_error', 'poisson'
     ],
-    'DecisionTree__splitter': ['best', 'random'],
-    'DecisionTree__max_depth': [None, 10, 20, 40],
-    'DecisionTree__min_samples_split': [2, 5, 10, 20],
-    'DecisionTree__min_samples_leaf': [1, 2, 4, 8],
-    'DecisionTree__max_features': ['sqrt', 'log2'],
+    'DecisionTree__max_depth': [10, 20, 40],
+    'DecisionTree__min_samples_split': [2, 5, 10, 15],
+    'DecisionTree__min_samples_leaf': [1, 2, 5, 10, 15],
+    # 'DecisionTree__splitter': ['best', 'random'],
+    # 'DecisionTree__max_features': ['sqrt', 'log2'],
     'DecisionTree__random_state': [seed]
 }
 
 RandomForestHyperparameters = {
-    'RandomForest__n_estimators': [100, 200, 400],
+    'RandomForest__n_estimators': [100, 200],
     'RandomForest__criterion': [
         'squared_error', 'absolute_error', 
         'friedman_mse', 'poisson'
     ],
     'RandomForest__max_depth': [None, 10, 20, 40],
-    'RandomForest__max_features': ['sqrt', 'log2'],
+    'RandomForest__class_weight': [None, 'balanced'],
+    # 'RandomForest__max_features': ['sqrt', 'log2'],
     'RandomForest__random_state': [seed]
 }
 
 LGBMRegressorHyperparameters = {
-    'LGBMRegressor__n_estimators': [100, 200, 400],
-    'LGBMRegressor__learning_rate': [0.01, 0.05, 0.1],
-    'LGBMRegressor__max_depth': [5, 10, 20],
-    'LGBMRegressor__num_leaves': [31, 127],
+    'LGBMRegressor__n_estimators': [50, 100, 200],
+    'LGBMRegressor__learning_rate': [0.01, 0.05, 0.1, 1.0],
+    'LGBMRegressor__max_depth': [10, 20, 40],
+    # 'LGBMRegressor__num_leaves': [31, 127],
     'LGBMRegressor__class_weight': [None, 'balanced'],
-    'LGBMRegressor__verbosity': [-1],
+    'LGBMRegressor__verbose': [-1],
     'LGBMRegressor__random_state': [seed]
 }
 
 XGBRegressorHyperparameters = {
-    'XGBRegressor__n_estimators': [100, 200, 400],
+    'XGBRegressor__n_estimators': [20, 50, 100],
     'XGBRegressor__learning_rate': [0.01, 0.05, 0.1],
-    'XGBRegressor__max_depth': [5, 10, 20],
-    'XGBRegressor__num_leaves': [31, 127],
-    'XGBRegressor__class_weight': [None, 'balanced'],
-    'XGBRegressor__verbosity': [0],
+    'XGBRegressor__max_depth': [10, 20, 40],
+    # 'XGBRegressor__max_leaves': [31, 127],
+    # 'XGBRegressor__class_weight': [None, 'balanced'],
+    'XGBRegressor__lambda': [0.01, 0.1, 0.5],
+    'XGBRegressor__verbose': [0],
     'XGBRegressor__random_state': [seed]
 }
 
 
 # Iterations with and without oversampling
-ros_transformer = RandomOverSamplerTransformer()
-smote = SMOTE(sampling_strategy="not majority", random_state=42, k_neighbors=5)
+# ros_transformer = RandomOverSamplerTransformer()
+# smote = SMOTE(sampling_strategy="not majority", random_state=42, k_neighbors=5)
 
 # Define the pre-pipeline oversampling strategies
 pre_pipeline_oversampling = [
     [],
-    [('SMOGN', None)],
+    # [('SMOGN', None)],
     # [('RandomOverSamplerTransformer', ros_transformer), ('SMOTE', smote)],
 ]
 
 models_and_hyperparameters = [
     (DecisionTreeRegressor(), DecisionTreeHyperparameters, 'DecisionTree'),
-#     (RandomForestRegressor(), RandomForestHyperparameters, 'RandomForest'),
-#     (LGBMRegressor(), LGBMRegressorHyperparameters, 'LGBMRegressor'),
-#     (XGBRegressor(), XGBRegressorHyperparameters, 'XGBRegressor')
+    # (RandomForestRegressor(), RandomForestHyperparameters, 'RandomForest'),
+    # (LGBMRegressor(), LGBMRegressorHyperparameters, 'LGBMRegressor'),
+    # (XGBRegressor(), XGBRegressorHyperparameters, 'XGBRegressor')
 ]
 
 for pipe in pre_pipeline_oversampling:
     for regressionModel, hyperParameters, regressionModelName in models_and_hyperparameters:
-        oversamplingName = '_' + pipe[-1][0] if len(pipe) > 0 else ''
+        suffix = '_' + pipe[-1][0] if len(pipe) > 0 else ''
         
         train_and_test_model(
             targetColumn, regressionModel, 
             hyperParameters, regressionModelName, 
-            seed, oversamplingName, pre_pipeline=pipe
+            seed, suffix, pre_pipeline=pipe
         )

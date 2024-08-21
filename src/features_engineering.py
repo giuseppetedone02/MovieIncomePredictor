@@ -51,15 +51,23 @@ df['Runtime_Encoded'] = df['Runtime_Binned'].map(ordinal_mapping)
 
 
 # Transformations on Company, Director, Writer, Main Actor
-top_companies = df['Company'].value_counts().nlargest(20).index
-top_directors = df['Director'].value_counts().nlargest(20).index
-top_writers = df['Writer'].value_counts().nlargest(20).index
-top_actors = df['Main Actor'].value_counts().nlargest(20).index
+# TO-DO: Aumentare numero di top per ogni categoria
+# TO-DO: Cambiare campi in 'Numero di film' per ogni categoria
+# top_companies = df['Company'].value_counts().nlargest(200).index
+# top_directors = df['Director'].value_counts().nlargest(200).index
+# top_writers = df['Writer'].value_counts().nlargest(200).index
+# top_actors = df['Main Actor'].value_counts().nlargest(200).index
 
-df['Top_Company'] = df['Company'].isin(top_companies).astype(int)
-df['Top_Director'] = df['Director'].isin(top_directors).astype(int)
-df['Top_Writer'] = df['Writer'].isin(top_writers).astype(int)
-df['Top_Main_Actor'] = df['Main Actor'].isin(top_actors).astype(int)
+# df['Top_Company'] = df['Company'].isin(top_companies).astype(int)
+# df['Top_Director'] = df['Director'].isin(top_directors).astype(int)
+# df['Top_Writer'] = df['Writer'].isin(top_writers).astype(int)
+# df['Top_Main_Actor'] = df['Main Actor'].isin(top_actors).astype(int)
+
+# Compute the number of movies for each category
+df['Director_Num_Movies'] = df['Director'].map(df['Director'].value_counts())
+df['Writer_Num_Movies'] = df['Writer'].map(df['Writer'].value_counts())
+df['Main_Actor_Num_Movies'] = df['Main Actor'].map(df['Main Actor'].value_counts())
+df['Company_Num_Movies'] = df['Company'].map(df['Company'].value_counts())
 
 
 # Transformations on Budget (using standardization)
@@ -97,8 +105,9 @@ df['Normalized_Score'] = min_max_scaler.fit_transform(df[['Score']])
 
 # Selection of final features and creation of the final dataset (features + target)
 features = [
-    'Year', 'Decade', 'Recent', 'Runtime_Encoded', 'Top_Company', 'Top_Main_Actor', 
-    'Top_Director', 'Top_Writer', 'Scaled_Standardized_Budget', 'Normalized_Score', 'Log_Votes'
+    'Year', 'Decade', 'Recent', 'Runtime_Encoded', 'Director_Num_Movies', 'Writer_Num_Movies', 
+    'Main_Actor_Num_Movies', 'Company_Num_Movies', 'Scaled_Standardized_Budget', 
+    'Normalized_Score', 'Log_Votes'
 ] + ratings + genres
 
 # Approximate the Worldwide Gross by removing the last two digits before the decimal point

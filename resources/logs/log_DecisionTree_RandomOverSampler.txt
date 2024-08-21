@@ -1,8 +1,0 @@
-﻿Best parameters found:
-DecisionTree__criterion            squared_error
-DecisionTree__max_depth            None      
-DecisionTree__max_features         sqrt      
-DecisionTree__min_samples_leaf     1         
-DecisionTree__min_samples_split    20        
-DecisionTree__random_state         42        
-DecisionTree__splitter             best      
