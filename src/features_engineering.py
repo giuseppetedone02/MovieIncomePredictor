@@ -37,8 +37,7 @@ ratings = [
     'R', 'NC-17', 'Not Rated', 
     'Unrated', 'X'
 ]
-for rating in ratings:
-    df[rating] = (df['MPAA'] == rating).astype(int)
+df = pd.get_dummies(df, columns=['MPAA'], prefix='', prefix_sep='')
 
 
 # Transformations on Runtime (using bins)
@@ -51,8 +50,6 @@ df['Runtime_Encoded'] = df['Runtime_Binned'].map(ordinal_mapping)
 
 
 # Transformations on Company, Director, Writer, Main Actor
-# TO-DO: Aumentare numero di top per ogni categoria
-# TO-DO: Cambiare campi in 'Numero di film' per ogni categoria
 # top_companies = df['Company'].value_counts().nlargest(200).index
 # top_directors = df['Director'].value_counts().nlargest(200).index
 # top_writers = df['Writer'].value_counts().nlargest(200).index
@@ -86,8 +83,7 @@ genres = [
     'Horror', 'Mystery', 'Romance', 
     'Sci-Fi', 'Thriller', 'Western'
 ]
-for genre in genres:
-    df[genre] = (df['Genre'] == genre).astype(int)
+df = pd.get_dummies(df, columns=['Genre'], prefix='', prefix_sep='')
 
 
 # Transformations on True and False values

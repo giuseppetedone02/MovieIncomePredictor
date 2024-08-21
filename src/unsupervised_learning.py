@@ -1,4 +1,5 @@
 import csv
+import numpy as np
 import pandas as pd
 import smogn
 import ImbalancedLearningRegression as iblr
@@ -48,8 +49,8 @@ def elbow_method(y):
     return kneeLocator.elbow
 
 
-def define_cluster(df, titlePrefix='', suffix=''):
-    y = df[['Log_Worldwide_Gross']]
+def define_cluster(df, features, titlePrefix='', suffix=''):
+    y = df[features]
     clusters = elbow_method(y)
 
     # Create a KMeans model with the optimal number of clusters
@@ -58,13 +59,19 @@ def define_cluster(df, titlePrefix='', suffix=''):
     model.fit(y)
 
     # Add the cluster labels to the DataFrame and save it to a new CSV file
+    clusters = model.labels_
+    centroids = model.cluster_centers_
+
     df['Cluster'] = model.labels_
     df.to_csv(f'../resources/dataset/Movie_dataset_clusters.csv', index=False)
+    
     visualize_pie_chart(df, titlePrefix, suffix)
+
+    return clusters, centroids
 
 
 # Display a pie chart of the distribution of movies in clusters
-def visualize_pie_chart(dataFrame, titlePrefix='', suffix=''):
+def visualize_pie_chart(dataFrame, features, titlePrefix='', suffix=''):
     cluster_counts = dataFrame['Cluster'].value_counts()
 
     plt.figure(figsize=(8, 8))
@@ -75,7 +82,7 @@ def visualize_pie_chart(dataFrame, titlePrefix='', suffix=''):
         startangle=140, 
         colors=['#ff9999','#66b3ff','#99ff99','#ffcc99','#c2c2f0']
     )
-    plt.title(f'{titlePrefix} Distribution of Movies in Clusters (Based on Worldwide Gross)')
+    plt.title(f'{titlePrefix} Distribution of Movies in Clusters')
     plt.legend(
         wedges, 
         [f'Cluster {i}' for i in cluster_counts.index], 
@@ -92,5 +99,10 @@ with open('../resources/dataset/Movie_dataset_features.csv', mode='r', encoding=
     reader = csv.DictReader(movieCsv)
     dataset = list(reader)
     df = pd.DataFrame(dataset)
-    
-define_cluster(df)
+
+features = [
+    'Runtime_Encoded', 'Director_Num_Movies', 'Writer_Num_Movies', 'Main_Actor_Num_Movies', 'Scaled_Standardized_Budget', 
+    'Decade', 'G', 'PG', 'PG-13', 'R', 'NC-17', 'Not Rated', 'Unrated', 'Action', 'Adventure', 'Animation', 'Comedy', 
+    'Crime', 'Drama', 'Fantasy', 'Horror', 'Mystery', 'Romance', 'Sci-Fi', 'Thriller', 'Western'
+]
+clusters, centroids = define_cluster(df, features)

@@ -1,14 +1,15 @@
 import csv
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import KBinsDiscretizer
 import smogn
+import ImbalancedLearningRegression as iblr
 
 from matplotlib import pyplot as plt
 from lightgbm import LGBMRegressor
 from xgboost import XGBRegressor
 from imblearn.pipeline import Pipeline
 
+from sklearn.preprocessing import KBinsDiscretizer
 from sklearn.discriminant_analysis import StandardScaler
 from sklearn.model_selection import GridSearchCV, RepeatedKFold, cross_validate, train_test_split, learning_curve
 from sklearn.tree import DecisionTreeRegressor
@@ -75,6 +76,9 @@ def train_and_test_model(
         targetColumn, regressionModel, hyperParameters, 
         regressionModelName, seed, suffix, pre_pipeline=[]):
     with open(f'../resources/logs/log_{regressionModelName}{suffix}.txt', mode='w', encoding='utf-8-sig') as logFile:
+        if suffix == '_IBLR':
+            df = iblr_ro
+        
         X = df.drop(columns=[targetColumn]).to_numpy()
         y = df[targetColumn].to_numpy()
 
