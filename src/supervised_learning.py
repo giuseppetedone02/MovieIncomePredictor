@@ -81,8 +81,6 @@ def train_and_test_model(
         
         if suffix == '_IBLR_RO':
             df = iblr_ro
-        elif suffix == '_IBLR_GN':
-            df = iblr_gn
         elif suffix == '_IBLR_UNDER':
             df = iblr_under
         elif suffix == '_SMOGN':
@@ -170,19 +168,20 @@ DecisionTreeHyperparameters = {
 }
 
 RandomForestHyperparameters = {
-    'RandomForest__n_estimators': [100, 200],
+    'RandomForest__n_estimators': [100],
     'RandomForest__criterion': [
         'squared_error', 'absolute_error', 
         'friedman_mse', 'poisson'
     ],
     'RandomForest__max_depth': [None, 10, 20],
+    'RandomForest__n_jobs': [-1],
     # 'RandomForest__max_features': ['sqrt', 'log2'],
     'RandomForest__random_state': [seed]
 }
 
 LGBMRegressorHyperparameters = {
-    'LGBMRegressor__n_estimators': [50, 100, 200],
-    'LGBMRegressor__learning_rate': [0.01, 0.05, 0.1, 1.0],
+    'LGBMRegressor__n_estimators': [50, 100, 200, 500],
+    'LGBMRegressor__learning_rate': [0.01, 0.02, 0.05, 0.1, 1.0],
     'LGBMRegressor__max_depth': [10, 20, 40],
     # 'LGBMRegressor__num_leaves': [31, 127],
     'LGBMRegressor__class_weight': [None, 'balanced'],
@@ -214,8 +213,8 @@ smogn_data = smogn.smoter(
 )
 
 iblr_ro = iblr.ro(
-    data = df,
-    y = 'Log_Worldwide_Gross',
+    data=df,
+    y='Log_Worldwide_Gross',
     samp_method='extreme',
     # manual_perc=True,
     # perc_o=2.0,
@@ -228,8 +227,8 @@ iblr_under = iblr.random_under(
     samp_method='extreme',
     # drop_na_col=True,
     # drop_na_row=True,
-    # manual_perc=True,
-    # perc_u=0.6,
+    manual_perc=True,
+    perc_u=0.5,
     rel_thres=0.5
 )
 
@@ -238,7 +237,7 @@ pre_pipeline_oversampling = [
     # [],
     # [('SMOGN', None)],
     [('IBLR_RO', None)],
-    # [('IBLR_UNDER', None)],
+    [('IBLR_UNDER', None)],
     # [('RandomOverSamplerTransformer', ros_transformer), ('SMOTE', smote)],
 ]
 
