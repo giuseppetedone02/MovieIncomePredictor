@@ -78,6 +78,16 @@ def train_and_test_model(
         targetColumn, regressionModel, hyperParameters, 
         regressionModelName, seed, suffix, pre_pipeline=[]):
     with open(f'../resources/logs/log_{regressionModelName}{suffix}.txt', mode='w', encoding='utf-8-sig') as logFile:
+        
+        if suffix == '_IBLR_RO':
+            df = iblr_ro
+        elif suffix == '_IBLR_GN':
+            df = iblr_gn
+        elif suffix == '_IBLR_UNDER':
+            df = iblr_under
+        elif suffix == '_SMOGN':
+            df = smogn_data
+
         X = df.drop(columns=[targetColumn]).to_numpy()
         y = df[targetColumn].to_numpy()
 
@@ -85,12 +95,7 @@ def train_and_test_model(
         scaler.fit(X)
         X = scaler.transform(X)
         
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=seed)
-
-        # Apply SMOGN if specified in the pipeline
-        if suffix == '_SMOGN':
-            X_train, y_train = smogn_resample_data(X_train, y_train, targetColumn)
-            
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=seed)   
 
         # Perform the grid search to find the best 
         # hyperparameters of the regression model
@@ -156,9 +161,9 @@ DecisionTreeHyperparameters = {
         'squared_error', 'friedman_mse', 
         'absolute_error', 'poisson'
     ],
-    'DecisionTree__max_depth': [10, 20, 40],
-    'DecisionTree__min_samples_split': [2, 5, 10, 15],
-    'DecisionTree__min_samples_leaf': [1, 2, 5, 10, 15],
+    'DecisionTree__max_depth': [5, 10, 15, 20, 40],
+    'DecisionTree__min_samples_split': [2, 5, 10, 15, 20, 30],
+    'DecisionTree__min_samples_leaf': [1, 2, 5, 10, 15, 20, 30, 50, 100],
     # 'DecisionTree__splitter': ['best', 'random'],
     # 'DecisionTree__max_features': ['sqrt', 'log2'],
     'DecisionTree__random_state': [seed]
@@ -170,7 +175,7 @@ RandomForestHyperparameters = {
         'squared_error', 'absolute_error', 
         'friedman_mse', 'poisson'
     ],
-    'RandomForest__max_depth': [None, 10, 20, 40],
+    'RandomForest__max_depth': [None, 10, 20],
     # 'RandomForest__max_features': ['sqrt', 'log2'],
     'RandomForest__random_state': [seed]
 }
@@ -201,17 +206,46 @@ XGBRegressorHyperparameters = {
 # ros_transformer = RandomOverSamplerTransformer()
 # smote = SMOTE(sampling_strategy="not majority", random_state=42, k_neighbors=5)
 
+smogn_data = smogn.smoter(
+    data=df, 
+    y=targetColumn,
+    samp_method='extreme',
+    rel_thres=0.5,
+)
+
+iblr_ro = iblr.ro(
+    data = df,
+    y = 'Log_Worldwide_Gross',
+    samp_method='extreme',
+    # manual_perc=True,
+    # perc_o=2.0,
+    rel_thres=0.5
+)
+
+iblr_under = iblr.random_under(
+    data=df,
+    y='Log_Worldwide_Gross',
+    samp_method='extreme',
+    # drop_na_col=True,
+    # drop_na_row=True,
+    # manual_perc=True,
+    # perc_u=0.6,
+    rel_thres=0.5
+)
+
 # Define the pre-pipeline oversampling strategies
 pre_pipeline_oversampling = [
-    [],
+    # [],
     # [('SMOGN', None)],
+    [('IBLR_RO', None)],
+    # [('IBLR_UNDER', None)],
     # [('RandomOverSamplerTransformer', ros_transformer), ('SMOTE', smote)],
 ]
 
 models_and_hyperparameters = [
-    (DecisionTreeRegressor(), DecisionTreeHyperparameters, 'DecisionTree'),
-    (RandomForestRegressor(), RandomForestHyperparameters, 'RandomForest'),
-    (LGBMRegressor(), LGBMRegressorHyperparameters, 'LGBMRegressor'),
+    # (DecisionTreeRegressor(), DecisionTreeHyperparameters, 'DecisionTree'),
+    # (RandomForestRegressor(), RandomForestHyperparameters, 'RandomForest'),
+    # (LGBMRegressor(), LGBMRegressorHyperparameters, 'LGBMRegressor'),
     (XGBRegressor(), XGBRegressorHyperparameters, 'XGBRegressor')
 ]
 
