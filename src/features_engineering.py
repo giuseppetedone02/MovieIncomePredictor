@@ -1,10 +1,22 @@
-import csv
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
 from sklearn.discriminant_analysis import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
-from utils import plot_distribution
+
+
+# Plot the distribution of a given feature
+def plot_distribution(data, title, xlabel, ylabel, filename, rotation=45):
+    plt.figure(figsize=(7, 10))
+    data.plot(kind='bar')
+
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.xticks(rotation=rotation)
+
+    plt.savefig(filename)
 
 
 # Load the dataset
@@ -45,16 +57,6 @@ df['Runtime_Encoded'] = df['Runtime_Binned'].map(ordinal_mapping)
 
 
 # Transformations on Company, Director, Writer, Main Actor
-# top_companies = df['Company'].value_counts().nlargest(200).index
-# top_directors = df['Director'].value_counts().nlargest(200).index
-# top_writers = df['Writer'].value_counts().nlargest(200).index
-# top_actors = df['Main Actor'].value_counts().nlargest(200).index
-
-# df['Top_Company'] = df['Company'].isin(top_companies).astype(int)
-# df['Top_Director'] = df['Director'].isin(top_directors).astype(int)
-# df['Top_Writer'] = df['Writer'].isin(top_writers).astype(int)
-# df['Top_Main_Actor'] = df['Main Actor'].isin(top_actors).astype(int)
-
 # Compute the number of movies for each category
 df['Director_Num_Movies'] = df['Director'].map(df['Director'].value_counts())
 df['Writer_Num_Movies'] = df['Writer'].map(df['Writer'].value_counts())

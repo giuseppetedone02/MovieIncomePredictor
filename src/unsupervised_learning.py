@@ -1,15 +1,9 @@
-import csv
-import numpy as np
 import pandas as pd
 from sklearn.metrics import silhouette_score
-import smogn
-import seaborn as sns
 
 from matplotlib import pyplot as plt
 from sklearn.cluster import KMeans
 from kneed import KneeLocator
-
-from oversampling import smogn_resample_data
 
 
 # Function to determine the optimal number of clusters using the elbow method
@@ -49,6 +43,7 @@ def elbow_method(y):
     return kneeLocator.elbow
 
 
+# Function to define clusters and visualize the distribution of movies in clusters
 def define_cluster(df, features, titlePrefix='', suffix=''):
     y = df[features]
     clusters = elbow_method(y)

@@ -2,6 +2,7 @@ import csv
 import pandas as pd
 
 
+# Function to write the Movie dataset to a Prolog knowledge base
 def process_movie_dataset():
     with open('../resources/dataset/Movie_dataset_cleaned.csv', mode='r', encoding='utf-8-sig') as movieCsv:
         reader = csv.DictReader(movieCsv)
@@ -19,6 +20,7 @@ def process_movie_dataset():
                 + repr(row['Genre']) + ', ' + row['Score'] + ', ' + row['Votes'] 
                 + ').\n')
 
+# Function to remove rows with missing values from a dataset
 def remove_na_from_movie_dataset(input_csv_path, output_csv_path):
     # Read the dataset from the CSV file, including malformed rows
     df = pd.read_csv(input_csv_path, on_bad_lines='skip')
