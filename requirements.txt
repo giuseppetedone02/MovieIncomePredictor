@@ -1,0 +1,12 @@
+pandas
+numpy
+scikit-learn
+matplotlib
+lightgbm
+xgboost
+plot
+kneed
+pgmpy
+imbalanced-learn
+smogn
+ImbalancedLearningRegression
