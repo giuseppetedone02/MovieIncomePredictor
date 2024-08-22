@@ -5299,16 +5299,38 @@ movie('Nine Queens', 2000, 'R', 114, 'FX Sound', 'Argentina', 'Fabián Bielinsky
 movie('Wild Tales', 2014, 'R', 122, 'Kramer & Sigman Films', 'Argentina', 'Damián Szifron', 'Germán Servidio', 'Darío Grandinetti', 3300000, 30642704.0, 'Comedy', 81.0, 1840000.0).
 movie('The Secret in Their Eyes', 2009, 'R', 129, 'Tornasol Films', 'Argentina', 'Juan José Campanella', 'Eduardo Sacheri', 'Ricardo Darín', 2000000, 35079650.0, 'Drama', 82.0, 1980000.0).
 
-% Translation of non-standard ratings to standard ratings
-translate_rating('TV-G', 'G').
-translate_rating('TV-PG', 'PG').
-translate_rating('TV-14', 'PG-13').
-translate_rating('TV-MA', 'R').
-translate_rating(Rating, Rating) :- rating(Rating).  % If the rating is already standard
+% Rules
+success(Movie) :-
+    movie(Movie, _, _, _, _, _, _, _, _, Budget, Gross, _, _, _),
+    Gross > 3 * Budget.
 
-% Add a movie only if its genres and rating are valid
-add_movie(Title, Year, Rating, Runtime, Company, Country, Director, Writer, MainActor, Budget, WorldwideGross, Genre, Score, Votes) :-
-    genre(Genre),
-    translate_rating(Rating, TranslatedRating),
-    rating(TranslatedRating),
-    assertz(movie(Title, Year, TranslatedRating, Runtime, Company, Country, Director, Writer, MainActor, Budget, WorldwideGross, Genre, Score, Votes)).
+flop(Movie) :-
+    movie(Movie, _, _, _, _, _, _, _, _, Budget, Gross, _, _, _),
+    Gross =< Budget.
+
+roi(Movie, ROI) :-
+    movie(Movie, _, _, _, _, _, _, _, _, Budget, Gross, _, _, _),
+    ROI is ((Gross - Budget) / Budget) * 100.
+
+% Find movies of a specific genre and rating
+movies_by_genre_and_rating(Genre, Rating, Movie) :-
+    movie(Movie, _, _, _, _, _, _, _, _, _, _, Genre, Rating, _).
+
+% Identify successful movies for a particular actor
+successful_movie_for_actor(Actor, Movie) :-
+    movie(Movie, _, _, _, _, _, _, _, Actor, Budget, Gross, _, _, _),
+    Gross > Budget.
+
+% Identify movies that fall within a certain length range
+movie_within_duration(Movie, MinDuration, MaxDuration) :-
+    movie(Movie, _, _, Duration, _, _, _, _, _, _, _, _, _, _),
+    Duration >= MinDuration,
+    Duration =< MaxDuration.
+
+% Calculate the average ratings of films directed by a given director
+average_rating_director(Director, AverageRating) :-
+    findall(Rating, movie(_, _, _, _, _, _, Director, _, _, _, _, _, Rating, _), Ratings),
+    sum_list(Ratings, Total),
+    length(Ratings, Count),
+    Count > 0,
+    AverageRating is Total / Count.
