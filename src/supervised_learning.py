@@ -18,6 +18,7 @@ from sklearn.metrics import make_scorer, mean_squared_error, mean_absolute_error
 from oversampling import RandomOverSamplerTransformer, smogn_resample_data
 
 
+# Function to plot the learning curve of a given regression model
 def plot_learning_curves(
         regressionModel, X, y, regressionModelName, 
         logFile, suffix):
@@ -72,6 +73,7 @@ def plot_learning_curves(
     plt.savefig(f'../resources/plots/learning_curves/learning_curve_{regressionModelName}{suffix}.png')
 
 
+# Function to train and test a regression model
 def train_and_test_model(
         targetColumn, regressionModel, hyperParameters, 
         regressionModelName, seed, suffix, pre_pipeline=[]):
@@ -148,9 +150,8 @@ df[targetColumn] = pd.to_numeric(df[targetColumn], errors='coerce')
 
 seed = 42
 
-# Define the cross-validation strategy and the scorer
+# Define the cross-validation strategy and the hyperparameters for the regression models
 cv = RepeatedKFold(n_splits=5, n_repeats=2, random_state=seed)
-
 
 DecisionTreeHyperparameters = {
     'DecisionTree__criterion': [
@@ -232,18 +233,18 @@ iblr_under = iblr.random_under(
 
 # Define the pre-pipeline oversampling strategies
 pre_pipeline_oversampling = [
-    # [],
+    [],
     # [('SMOGN', None)],
-    [('IBLR_RO', None)],
+    # [('IBLR_RO', None)],
     # [('IBLR_UNDER', None)],
     # [('RandomOverSamplerTransformer', ros_transformer), ('SMOTE', smote)],
 ]
 
 models_and_hyperparameters = [
     (DecisionTreeRegressor(), DecisionTreeHyperparameters, 'DecisionTree'),
-    # (RandomForestRegressor(), RandomForestHyperparameters, 'RandomForest'),
-    # (LGBMRegressor(), LGBMRegressorHyperparameters, 'LGBMRegressor'),
-    # (XGBRegressor(), XGBRegressorHyperparameters, 'XGBRegressor')
+    (RandomForestRegressor(), RandomForestHyperparameters, 'RandomForest'),
+    (LGBMRegressor(), LGBMRegressorHyperparameters, 'LGBMRegressor'),
+    (XGBRegressor(), XGBRegressorHyperparameters, 'XGBRegressor')
 ]
 
 for pipe in pre_pipeline_oversampling:

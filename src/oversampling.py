@@ -1,11 +1,12 @@
+import smogn
 import pandas as pd
 import numpy as np
-import smogn
 
-from imblearn.over_sampling import RandomOverSampler, SMOTE
+from imblearn.over_sampling import RandomOverSampler
 from sklearn.preprocessing import KBinsDiscretizer
 
 
+# Custom transformer to apply RandomOverSampler to a regression dataset
 class RandomOverSamplerTransformer():
     def __init__(self, threshold=25):
         self.threshold = threshold

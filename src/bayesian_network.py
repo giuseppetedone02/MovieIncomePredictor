@@ -7,7 +7,13 @@ from pgmpy.models import BayesianNetwork
 from pgmpy.inference import VariableElimination
 from pgmpy.estimators import MaximumLikelihoodEstimator, HillClimbSearch, K2Score
 from sklearn.preprocessing import KBinsDiscretizer
-from utils import reduce_categories
+
+
+# Reduce the number of categories in a given column
+def reduce_categories(df, column, threshold=10):
+    counts = df[column].value_counts()
+    to_keep = counts[counts > threshold].index
+    df[column] = df[column].apply(lambda x: x if x in to_keep else 'Other')
 
 
 # Create a Bayesian Network model
