@@ -1,4 +1,3 @@
-import csv
 import numpy as np
 import pandas as pd
 import smogn
@@ -7,15 +6,14 @@ import ImbalancedLearningRegression as iblr
 from matplotlib import pyplot as plt
 from lightgbm import LGBMRegressor
 from xgboost import XGBRegressor
-from imblearn.pipeline import Pipeline
 
-from sklearn.preprocessing import KBinsDiscretizer
+from imblearn.pipeline import Pipeline
+from imblearn.over_sampling import SMOTE
 from sklearn.discriminant_analysis import StandardScaler
 from sklearn.model_selection import GridSearchCV, RepeatedKFold, cross_validate, train_test_split, learning_curve
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import make_scorer, mean_squared_error, mean_absolute_error, mean_squared_log_error, r2_score
-from imblearn.over_sampling import SMOTE
 
 from oversampling import RandomOverSamplerTransformer, smogn_resample_data
 
@@ -237,15 +235,15 @@ pre_pipeline_oversampling = [
     # [],
     # [('SMOGN', None)],
     [('IBLR_RO', None)],
-    [('IBLR_UNDER', None)],
+    # [('IBLR_UNDER', None)],
     # [('RandomOverSamplerTransformer', ros_transformer), ('SMOTE', smote)],
 ]
 
 models_and_hyperparameters = [
-    # (DecisionTreeRegressor(), DecisionTreeHyperparameters, 'DecisionTree'),
+    (DecisionTreeRegressor(), DecisionTreeHyperparameters, 'DecisionTree'),
     # (RandomForestRegressor(), RandomForestHyperparameters, 'RandomForest'),
     # (LGBMRegressor(), LGBMRegressorHyperparameters, 'LGBMRegressor'),
-    (XGBRegressor(), XGBRegressorHyperparameters, 'XGBRegressor')
+    # (XGBRegressor(), XGBRegressorHyperparameters, 'XGBRegressor')
 ]
 
 for pipe in pre_pipeline_oversampling:

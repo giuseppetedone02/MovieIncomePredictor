@@ -8,3 +8,5 @@ plot
 kneed
 pgmpy
 imbalanced-learn
+smogn
+ImbalancedLearningRegression
