@@ -83,6 +83,10 @@ genres = [
 df = pd.get_dummies(df, columns=['Genre'], prefix='', prefix_sep='')
 
 
+# Transformations on Country (categorical feature)
+df = pd.get_dummies(df, columns=['Country'], prefix='Country', prefix_sep='_')
+
+
 # Transformations on True and False values
 # Imposta l'opzione per evitare il downcasting silenzioso
 pd.set_option('future.no_silent_downcasting', True)
@@ -101,7 +105,7 @@ features = [
     'Year', 'Decade', 'Recent', 'Runtime_Encoded', 'Director_Num_Movies', 'Writer_Num_Movies', 
     'Main_Actor_Num_Movies', 'Company_Num_Movies', 'Scaled_Standardized_Budget', 
     'Normalized_Score', 'Log_Votes'
-] + ratings + genres
+] + ratings + genres + list(df.filter(like='Country_').columns)
 
 # Approximate the Worldwide Gross by removing the last two digits before the decimal point
 df['Worldwide Gross'] = (df['Worldwide Gross'] // 100) * 100

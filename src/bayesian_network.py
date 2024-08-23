@@ -13,6 +13,7 @@ from sklearn.preprocessing import KBinsDiscretizer
 def reduce_categories(df, column, threshold=10):
     counts = df[column].value_counts()
     to_keep = counts[counts > threshold].index
+    print(f'Counts {column}: {len(counts)} \nTO keep {column}:', len(to_keep), '\n')
     df[column] = df[column].apply(lambda x: x if x in to_keep else 'Other')
 
 
@@ -31,9 +32,9 @@ def create_bayesian_network(dataset):
         edges.append(('Genre', 'Votes'))
         edges.append(('Company', 'Budget'))
         edges.append(('Company', 'Country'))
-        edges.append(('Director', 'Genre'))
-        edges.append(('Writer', 'Genre'))
-        edges.append(('Main Actor', 'Genre'))
+        edges.append(('Director_Num_Movies', 'Genre'))
+        edges.append(('Writer_Num_Movies', 'Genre'))
+        edges.append(('Main_Actor_Num_Movies', 'Genre'))
 
     # Perform a Hill Climbing Search to estimate the Bayesian Network  
     # hc_k2 = HillClimbSearch(dataset)
@@ -106,18 +107,9 @@ def generate_random_example(bn: BayesianNetwork):
 
 # Get the dataset
 df = pd.read_csv('../resources/dataset/Movie_dataset_cleaned.csv', encoding='utf-8-sig')
-df.drop(columns=['Title'], axis=1, inplace=True)
-
-# Pre-process the data
-df['Budget'] = pd.to_numeric(df['Budget'], errors='coerce')
-df['Worldwide Gross'] = pd.to_numeric(df['Worldwide Gross'], errors='coerce')
-df['Score'] = pd.to_numeric(df['Score'], errors='coerce')
-df['Votes'] = pd.to_numeric(df['Votes'], errors='coerce')
-df['Runtime'] = pd.to_numeric(df['Runtime'], errors='coerce')
-df['Year'] = pd.to_numeric(df['Year'], errors='coerce')
 
 # Ensure categorical variables are treated as such
-categorical_columns = ['Genre', 'MPAA', 'Company', 'Country', 'Director', 'Writer', 'Main Actor']
+categorical_columns = ['Genre', 'MPAA', 'Company', 'Country']
 for col in categorical_columns:
     df[col] = df[col].astype('category')
 
@@ -128,11 +120,11 @@ df['Runtime'] = discretizer.fit_transform(df[['Runtime']])
 df['Worldwide Gross'] = discretizer.fit_transform(df[['Worldwide Gross']])
 
 # Reduce the number of categories in categorical variables
-reduce_categories(df, 'Company', threshold=10)
-reduce_categories(df, 'Director', threshold=20)
-reduce_categories(df, 'Writer', threshold=10)
-reduce_categories(df, 'Main Actor', threshold=20)
+df['Director_Num_Movies'] = df['Director'].map(df['Director'].value_counts())
+df['Writer_Num_Movies'] = df['Writer'].map(df['Writer'].value_counts())
+df['Main_Actor_Num_Movies'] = df['Main Actor'].map(df['Main Actor'].value_counts())
 
+df.drop(columns=['Title', 'Director', 'Writer', 'Main Actor'], axis=1, inplace=True)
 
 bn = create_bayesian_network(df)
 # bn = load_bayesian_network()

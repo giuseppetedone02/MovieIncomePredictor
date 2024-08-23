@@ -77,17 +77,21 @@ def plot_learning_curves(
 def train_and_test_model(
         targetColumn, regressionModel, hyperParameters, 
         regressionModelName, seed, suffix, pre_pipeline=[]):
+    global df
+    df_copy = df.copy()
+
+    # Open the log file to write the results
     with open(f'../resources/logs/log_{regressionModelName}{suffix}.txt', mode='w', encoding='utf-8-sig') as logFile:
         
         if suffix == '_IBLR_RO':
-            df = iblr_ro
+            df_copy = iblr_ro
         elif suffix == '_IBLR_UNDER':
-            df = iblr_under
+            df_copy = iblr_under
         elif suffix == '_SMOGN':
-            df = smogn_data
+            df_copy = smogn_data
 
-        X = df.drop(columns=[targetColumn]).to_numpy()
-        y = df[targetColumn].to_numpy()
+        X = df_copy.drop(columns=[targetColumn]).to_numpy()
+        y = df_copy[targetColumn].to_numpy()
 
         scaler = StandardScaler()
         scaler.fit(X)
@@ -138,7 +142,6 @@ def train_and_test_model(
 
         # Plot the learning curve
         plot_learning_curves(clf, X, y, regressionModelName, logFile, suffix)
-
 
 
 # Load the dataset
@@ -233,10 +236,10 @@ iblr_under = iblr.random_under(
 
 # Define the pre-pipeline oversampling strategies
 pre_pipeline_oversampling = [
-    [],
-    # [('SMOGN', None)],
-    # [('IBLR_RO', None)],
-    # [('IBLR_UNDER', None)],
+    # [],
+    [('SMOGN', None)],
+    [('IBLR_RO', None)],
+    [('IBLR_UNDER', None)],
     # [('RandomOverSamplerTransformer', ros_transformer), ('SMOTE', smote)],
 ]
 
