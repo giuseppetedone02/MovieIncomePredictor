@@ -34,16 +34,7 @@ Size    Mean Test Score          Variance Test Score      Std Test Score        
  -1.35882557 -1.37562748 -1.36235055 -1.37609789]
 4       -1.3611949549174964      0.006137535022101916     0.07834242159967941      [-1.29093946 -1.4233365  -1.2128969  -1.43393228 -1.45525592 -1.46918118
  -1.34024456 -1.35553262 -1.30805181 -1.32257831]
-
-Best parameters found:
-DecisionTree__criterion            absolute_error
-DecisionTree__max_depth            10        
-DecisionTree__min_samples_leaf     15        
-DecisionTree__min_samples_split    2         
-DecisionTree__random_state         42        
-
-Metric    Score Mean               Score Variance           Score Std                
-MSE       1.3857668810189543       0.010299006586698752     0.1014840213368526       
+    
 MAE       0.8248382393512393       0.0005356821003231628    0.023144807199956596     
 MSLE      0.004068272106306705     1.7241846120713368e-07   0.0004152330203718554    
 R2        0.6119274868771869       0.0005751307979258162    0.023981884786768038     
