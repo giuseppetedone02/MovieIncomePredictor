@@ -237,9 +237,9 @@ iblr_under = iblr.random_under(
 # Define the pre-pipeline oversampling strategies
 pre_pipeline_oversampling = [
     [],
-    [('SMOGN', None)],
-    [('IBLR_RO', None)],
-    [('IBLR_UNDER', None)],
+    # [('SMOGN', None)],
+    # [('IBLR_RO', None)],
+    # [('IBLR_UNDER', None)],
     # [('RandomOverSamplerTransformer', ros_transformer), ('SMOTE', smote)],
 ]
 
