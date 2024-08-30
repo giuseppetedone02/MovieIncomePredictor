@@ -97,7 +97,7 @@ def train_and_test_model(
         scaler.fit(X)
         X = scaler.transform(X)
         
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=seed)   
+        # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=seed)   
 
         # Perform the grid search to find the best 
         # hyperparameters of the regression model
@@ -111,7 +111,7 @@ def train_and_test_model(
             scoring = 'neg_mean_squared_error',
             error_score='raise'
         )
-        gridSearchCV.fit(X_train, y_train)
+        gridSearchCV.fit(X, y)
 
         # Write the results to the log file
         logFile.write("Best parameters found:\n")
@@ -236,7 +236,7 @@ iblr_under = iblr.random_under(
 
 # Define the pre-pipeline oversampling strategies
 pre_pipeline_oversampling = [
-    # [],
+    [],
     [('SMOGN', None)],
     [('IBLR_RO', None)],
     [('IBLR_UNDER', None)],
@@ -244,9 +244,9 @@ pre_pipeline_oversampling = [
 ]
 
 models_and_hyperparameters = [
-    (DecisionTreeRegressor(), DecisionTreeHyperparameters, 'DecisionTree'),
+    # (DecisionTreeRegressor(), DecisionTreeHyperparameters, 'DecisionTree'),
     (RandomForestRegressor(), RandomForestHyperparameters, 'RandomForest'),
-    (LGBMRegressor(), LGBMRegressorHyperparameters, 'LGBMRegressor'),
+    # (LGBMRegressor(), LGBMRegressorHyperparameters, 'LGBMRegressor'),
     (XGBRegressor(), XGBRegressorHyperparameters, 'XGBRegressor')
 ]
 
