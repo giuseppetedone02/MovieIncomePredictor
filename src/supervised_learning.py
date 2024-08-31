@@ -112,6 +112,7 @@ def train_and_test_model(
             error_score='raise'
         )
         gridSearchCV.fit(X, y)
+        
 
         # Write the results to the log file
         logFile.write("Best parameters found:\n")
@@ -244,9 +245,9 @@ pre_pipeline_oversampling = [
 ]
 
 models_and_hyperparameters = [
-    # (DecisionTreeRegressor(), DecisionTreeHyperparameters, 'DecisionTree'),
+    (DecisionTreeRegressor(), DecisionTreeHyperparameters, 'DecisionTree'),
     (RandomForestRegressor(), RandomForestHyperparameters, 'RandomForest'),
-    # (LGBMRegressor(), LGBMRegressorHyperparameters, 'LGBMRegressor'),
+    (LGBMRegressor(), LGBMRegressorHyperparameters, 'LGBMRegressor'),
     (XGBRegressor(), XGBRegressorHyperparameters, 'XGBRegressor')
 ]
 
