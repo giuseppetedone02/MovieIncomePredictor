@@ -34,14 +34,14 @@ class RandomOverSamplerTransformer():
 
 # Function to handle missing values in the dataset
 def handle_missing_values(data):
-    # Separare le feature numeriche e categoriche
+    # Separate numeric and categorical features
     numeric_features = data.select_dtypes(include=['float64', 'int64']).columns
     categorical_features = data.select_dtypes(include=['object']).columns
 
-    # Imputazione mediana per le feature numeriche
+    # Impute median for numeric features
     data[numeric_features] = data[numeric_features].fillna(data[numeric_features].median())
 
-    # Imputazione moda per le feature categoriche
+    # Impute mode for categorical features
     for feature in categorical_features:
         data[feature] = data[feature].fillna(data[feature].mode()[0])
 
@@ -57,7 +57,7 @@ def smogn_resample_data(X_train, y_train, targetColumn):
     
     train_data = pd.concat([pd.DataFrame(X_train), pd.Series(y_train, name=targetColumn)], axis=1)
 
-    # Controllo preliminare sui dati
+    # Preliminary data check
     if train_data.isnull().values.any():
         print("I dati contengono valori nulli. Pulizia dei dati in corso...")
         train_data = handle_missing_values(train_data)
