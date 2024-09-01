@@ -81,7 +81,7 @@ def train_and_test_model(
     df_copy = df.copy()
 
     # Open the log file to write the results
-    with open(f'../resources/logs/log_{regressionModelName}{suffix}.txt', mode='w', encoding='utf-8-sig') as logFile:
+    with open(f'../resources/logs/supervised_learning/log_{regressionModelName}{suffix}.txt', mode='w', encoding='utf-8-sig') as logFile:
         
         if suffix == '_IBLR_RO':
             df_copy = iblr_ro
