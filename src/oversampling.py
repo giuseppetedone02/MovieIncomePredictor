@@ -20,9 +20,7 @@ class RandomOverSamplerTransformer():
 
         # Count the number of examples per class before oversampling
         occurrences = {item: list(y_discretized).count(item) for item in y_discretized}
-        # print("\nClass distribution before RandomOverSampling:")
-        # print(occurrences)
-        
+
         # Apply RandomOverSampler
         self.sampling_strategy = {cls: self.threshold for cls, count in occurrences.items() if count < self.threshold}
         print("Sampling strategy:", self.sampling_strategy)
