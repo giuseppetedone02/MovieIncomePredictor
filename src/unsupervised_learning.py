@@ -99,10 +99,12 @@ features = [
 ]
 clusters, centroids = define_cluster(df, features)
 
-# Calculate and print the silhouette score
-sil_score = silhouette_score(df[features], clusters)
-print(f'Silhouette Score: {sil_score}')
+# Calculate the silhouette score
+with open('../resources/logs/unsupervised_learning/cluster_stats.log', 'w') as logFile:
+    sil_score = silhouette_score(df[features], clusters)
+    logFile.write('Silhouette Score: {}\n\n'.format(sil_score))
 
-# Calculate mean and median of features for each cluster
-cluster_stats = df.groupby('Cluster')[features].agg(['mean', 'median'])
-print(cluster_stats)
+    # Calculate mean and median of features for each cluster
+    cluster_stats = df.groupby('Cluster')[features].agg(['mean', 'median'])
+    logFile.write('Cluster Statistics:\n')
+    logFile.write(cluster_stats.to_string())
