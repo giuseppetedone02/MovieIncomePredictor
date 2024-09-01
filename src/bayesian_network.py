@@ -9,14 +9,6 @@ from pgmpy.estimators import MaximumLikelihoodEstimator, HillClimbSearch, K2Scor
 from sklearn.preprocessing import KBinsDiscretizer
 
 
-# Reduce the number of categories in a given column
-def reduce_categories(df, column, threshold=10):
-    counts = df[column].value_counts()
-    to_keep = counts[counts > threshold].index
-    print(f'Counts {column}: {len(counts)} \nTO keep {column}:', len(to_keep), '\n')
-    df[column] = df[column].apply(lambda x: x if x in to_keep else 'Other')
-
-
 # Create a Bayesian Network model
 def create_bayesian_network(dataset):
     edges = []
