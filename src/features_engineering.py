@@ -40,9 +40,8 @@ df['Recent'] = df['Year'] >= 2010
 
 # Transformations on MPAA (categorical feature)
 ratings = [
-    'G', 'PG', 'PG-13', 
-    'R', 'NC-17', 'Not Rated', 
-    'Unrated', 'X'
+    'G', 'PG', 'PG-13', 'R', 
+    'NC-17', 'Not Rated', 'Unrated'
 ]
 df = pd.get_dummies(df, columns=['MPAA'], prefix='', prefix_sep='')
 

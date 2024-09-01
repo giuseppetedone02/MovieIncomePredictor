@@ -4291,7 +4291,7 @@ movie('Superman IV: The Quest for Peace', 1987, 'PG', 90, 'Cannon Films', 'Unite
 movie('Lady Jane', 1986, 'PG-13', 136, 'Capital Equipment Leasing', 'United Kingdom', 'Trevor Nunn', 'Chris Bryant', 'Helena Bonham Carter', 8500000, 277646.0, 'Biography', 71.0, 63000.0).
 movie('Downton Abbey', 2019, 'PG', 122, 'Carnival Film & Television', 'United Kingdom', 'Michael Engler', 'Julian Fellowes', 'Stephen Campbell Moore', 13000000, 192094429.0, 'Drama', 74.0, 430000.0).
 movie('Under Suspicion', 1991, 'R', 99, 'Carnival Film & Television', 'United Kingdom', 'Simon Moore', 'Simon Moore', 'Liam Neeson', 25000000, 1308242.0, 'Crime', 65.0, 38000.0).
-movie('Angel Heart', 1987, 'X', 113, 'Carolco International N.V.', 'United Kingdom', 'Alan Parker', 'William Hjortsberg', 'Mickey Rourke', 17000000, 17186348.0, 'Horror', 73.0, 830000.0).
+movie('Angel Heart', 1987, 'NC-17', 113, 'Carolco International N.V.', 'United Kingdom', 'Alan Parker', 'William Hjortsberg', 'Mickey Rourke', 17000000, 17186348.0, 'Horror', 73.0, 830000.0).
 movie('Chaplin', 1992, 'PG-13', 143, 'Carolco Pictures', 'United Kingdom', 'Richard Attenborough', 'David Robinson', 'Robert Downey Jr.', 31000000, 9493259.0, 'Biography', 75.0, 550000.0).
 movie('Beyond Rangoon', 1995, 'R', 100, 'Castle Rock Entertainment', 'United Kingdom', 'John Boorman', 'Alex Lasker', 'Patricia Arquette', 23000000, 5750110.0, 'Action', 66.0, 49000.0).
 movie('Extreme Measures', 1996, 'R', 118, 'Castle Rock Entertainment', 'United Kingdom', 'Michael Apted', 'Michael Palmer', 'Hugh Grant', 38000000, 17380126.0, 'Crime', 62.0, 170000.0).

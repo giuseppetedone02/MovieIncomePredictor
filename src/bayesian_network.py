@@ -131,3 +131,7 @@ print("Example: " + str(example))
 inference = VariableElimination(bn)
 result = inference.query(variables=['Worldwide Gross'], evidence=example.iloc[0].to_dict())
 print(result)
+
+# Query the Bayesian Network with a film with MPAA of NC-17
+result = inference.query(variables=['Worldwide Gross'], evidence={'MPAA': 'NC-17'})
+print('\nCPD per film con MPAA = NC-17: \n', result)
