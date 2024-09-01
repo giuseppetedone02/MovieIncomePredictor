@@ -87,10 +87,11 @@ def display_bayesian_network(bn: BayesianNetwork):
 def show_CPD(bn: BayesianNetwork):
     cpds = bn.get_cpds()
 
-    for cpd in cpds:
-        if cpd.variable != 'Votes':
-            print(f'CPD of {cpd.variable}:')
-            print(cpd, '\n')
+    with open('../resources/logs/bayesian_network/cpd.txt', 'w') as logfile:
+        for cpd in cpds:
+            if cpd.variable != 'Votes':
+                logfile.write(f'CPD of {cpd.variable}:\n')
+                logfile.write(str(cpd) + '\n\n')
 
 # Generate a random example
 def generate_random_example(bn: BayesianNetwork):
