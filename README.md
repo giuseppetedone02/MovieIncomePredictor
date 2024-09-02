@@ -1,2 +1,2 @@
 # ICon-Project
-Progetto per esame di Ingegneria della Conoscenza presso l'Università di Bari, anno 2023/2024
+Progetto per l'esame di Ingegneria della Conoscenza presso l'Università degli Studi di Bari "Aldo Moro", anno 2023/2024
