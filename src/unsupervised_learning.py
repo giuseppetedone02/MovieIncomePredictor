@@ -100,7 +100,7 @@ features = [
 clusters, centroids = define_cluster(df, features)
 
 # Calculate the silhouette score
-with open('../resources/logs/unsupervised_learning/cluster_stats.log', 'w') as logFile:
+with open('../resources/logs/unsupervised_learning/cluster_stats.txt', 'w') as logFile:
     sil_score = silhouette_score(df[features], clusters)
     logFile.write('Silhouette Score: {}\n\n'.format(sil_score))
 

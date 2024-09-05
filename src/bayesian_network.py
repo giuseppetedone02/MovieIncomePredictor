@@ -12,7 +12,7 @@ from sklearn.preprocessing import KBinsDiscretizer
 # Create a Bayesian Network model
 def create_bayesian_network(dataset):
     edges = []
-    columns_to_exclude = ['MPAA', 'Country', 'Budget', 'Worldwide Gross', 'Genre', 'Score', 'Votes']
+    columns_to_exclude = ['MPAA', 'Country', 'Budget', 'ROI', 'Worldwide Gross', 'Genre', 'Score', 'Votes']
 
     # Define the edges of the Bayesian Network
     for column in dataset.columns:
@@ -27,6 +27,7 @@ def create_bayesian_network(dataset):
         edges.append(('Director_Num_Movies', 'Genre'))
         edges.append(('Writer_Num_Movies', 'Genre'))
         edges.append(('Main_Actor_Num_Movies', 'Genre'))
+        edges.append(('Budget', 'ROI'))
 
     # Perform a Hill Climbing Search to estimate the Bayesian Network  
     # hc_k2 = HillClimbSearch(dataset)
@@ -99,7 +100,7 @@ def generate_random_example(bn: BayesianNetwork):
 
 
 # Get the dataset
-df = pd.read_csv('../resources/dataset/Movie_dataset_cleaned.csv', encoding='utf-8-sig')
+df = pd.read_csv('../resources/dataset/Movie_dataset_with_prolog_results.csv', encoding='utf-8-sig')
 
 # Ensure categorical variables are treated as such
 categorical_columns = ['Genre', 'MPAA', 'Company', 'Country']

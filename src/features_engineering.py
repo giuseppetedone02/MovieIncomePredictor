@@ -20,14 +20,14 @@ def plot_distribution(data, title, xlabel, ylabel, filename, rotation=45):
 
 
 # Load the dataset
-df = pd.read_csv('../resources/dataset/Movie_dataset_cleaned.csv', encoding='utf-8-sig')
+df = pd.read_csv('../resources/dataset/Movie_dataset_with_prolog_results.csv', encoding='utf-8-sig')
 df = df.dropna()
 
 # Convert numeric columns that might be read as strings
 numeric_columns = [
     'Year', 'Runtime', 
     'Budget', 'Worldwide Gross', 
-    'Score', 'Votes'
+    'Score', 'Votes', 'ROI'
 ]
 for column in numeric_columns:
     df[column] = pd.to_numeric(df[column], errors='coerce')
@@ -99,11 +99,19 @@ df['Log_Votes'] = np.log1p(df['Votes'])
 min_max_scaler = MinMaxScaler()
 df['Normalized_Score'] = min_max_scaler.fit_transform(df[['Score']])
 
+
+# Transformations on ROI (using log transformation)
+df['Log_ROI'] = np.log1p(df['ROI'])
+
+
+# Drop null values and save the dataset to a CSV file
+df = df.dropna()
+
 # Selection of final features and creation of the final dataset (features + target)
 features = [
     'Year', 'Decade', 'Recent', 'Runtime_Encoded', 'Director_Num_Movies', 'Writer_Num_Movies', 
     'Main_Actor_Num_Movies', 'Company_Num_Movies', 'Scaled_Standardized_Budget', 
-    'Normalized_Score', 'Log_Votes'
+    'Normalized_Score', 'Log_Votes', 'Log_ROI', 'Success'
 ] + ratings + genres + list(df.filter(like='Country_').columns)
 
 # Approximate the Worldwide Gross by removing the last two digits before the decimal point

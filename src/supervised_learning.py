@@ -146,7 +146,7 @@ def train_and_test_model(
 
 
 # Load the dataset
-df = pd.read_csv('../resources/dataset/Movie_dataset_features.csv', encoding='utf-8-sig')
+df = pd.read_csv('../resources/dataset/Movie_dataset_clusters.csv', encoding='utf-8-sig')
 
 # Convert target column to numeric, coercing errors
 targetColumn = 'Log_Worldwide_Gross'
@@ -238,16 +238,16 @@ iblr_under = iblr.random_under(
 # Define the pre-pipeline oversampling strategies
 pre_pipeline_oversampling = [
     [],
-    # [('SMOGN', None)],
-    # [('IBLR_RO', None)],
-    # [('IBLR_UNDER', None)],
+    [('SMOGN', None)],
+    [('IBLR_RO', None)],
+    [('IBLR_UNDER', None)],
     # [('RandomOverSamplerTransformer', ros_transformer), ('SMOTE', smote)],
 ]
 
 models_and_hyperparameters = [
-    (DecisionTreeRegressor(), DecisionTreeHyperparameters, 'DecisionTree'),
+    # (DecisionTreeRegressor(), DecisionTreeHyperparameters, 'DecisionTree'),
     (RandomForestRegressor(), RandomForestHyperparameters, 'RandomForest'),
-    (LGBMRegressor(), LGBMRegressorHyperparameters, 'LGBMRegressor'),
+    # (LGBMRegressor(), LGBMRegressorHyperparameters, 'LGBMRegressor'),
     (XGBRegressor(), XGBRegressorHyperparameters, 'XGBRegressor')
 ]
 

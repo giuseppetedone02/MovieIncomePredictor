@@ -7,6 +7,7 @@ numpy==1.26.4
 pandas==2.2.2
 pgmpy==0.1.26
 plot==0.6.5
+pyswip==0.2.10
 scikit-learn==1.5.1
 smogn==0.1.2
 xgboost==2.1.1
