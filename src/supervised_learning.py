@@ -238,16 +238,16 @@ iblr_under = iblr.random_under(
 # Define the pre-pipeline oversampling strategies
 pre_pipeline_oversampling = [
     [],
-    [('SMOGN', None)],
-    [('IBLR_RO', None)],
-    [('IBLR_UNDER', None)],
-    # [('RandomOverSamplerTransformer', ros_transformer), ('SMOTE', smote)],
+    # [('SMOGN', None)],
+    # [('IBLR_RO', None)],
+    # [('IBLR_UNDER', None)],
+    # # [('RandomOverSamplerTransformer', ros_transformer), ('SMOTE', smote)],
 ]
 
 models_and_hyperparameters = [
-    # (DecisionTreeRegressor(), DecisionTreeHyperparameters, 'DecisionTree'),
+    (DecisionTreeRegressor(), DecisionTreeHyperparameters, 'DecisionTree'),
     (RandomForestRegressor(), RandomForestHyperparameters, 'RandomForest'),
-    # (LGBMRegressor(), LGBMRegressorHyperparameters, 'LGBMRegressor'),
+    (LGBMRegressor(), LGBMRegressorHyperparameters, 'LGBMRegressor'),
     (XGBRegressor(), XGBRegressorHyperparameters, 'XGBRegressor')
 ]
 
