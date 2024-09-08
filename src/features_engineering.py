@@ -74,8 +74,8 @@ df['Scaled_Standardized_Budget'] = min_max_scaler.fit_transform(df[['Standardize
 
 # Transformations on Genre (categorical feature)
 genres = [
-    'Action', 'Adventure', 'Animation', 'Comedy', 
-    'Crime', 'Drama', 'Fantasy', 
+    'Action', 'Adventure', 'Animation', 'Biography', 
+    'Comedy', 'Crime', 'Drama', 'Family', 'Fantasy', 
     'Horror', 'Mystery', 'Romance', 
     'Sci-Fi', 'Thriller', 'Western'
 ]

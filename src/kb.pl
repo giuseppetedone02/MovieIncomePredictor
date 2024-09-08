@@ -5298,10 +5298,11 @@ movie('Curious George', 2006, 'G', 87, 'Imagine Entertainment', 'United States',
 movie('High School Musical 3: Senior Year', 2008, 'G', 112, 'Walt Disney Pictures', 'United States', 'Kenny Ortega', 'Peter Barsocchini', 'Zac Efron', 11000000, 2529091770, 'Comedy', 49, 5900000).
 movie('Chicken Little', 2005, 'G', 81, 'Walt Disney Pictures', 'United States', 'Mark Dindal', 'Mark Dindal', 'Zach Braff', 150000000, 3144328370, 'Animation', 57, 8800000).
 
-roi(Movie, ROI) :-
-    movie(Movie, _, _, _, _, _, _, _, _, Budget, Gross, _, _, _),
-    ROI is ((Gross - Budget) / Budget) * 100.
+    roi(Movie, ROI) :-
+        movie(Movie, _, _, _, _, _, _, _, _, Budget, Gross, _, _, _),
+        ROI is ((Gross - Budget) / Budget) * 100.
 
-success(Movie) :-
-    roi(Movie, ROI),
-    ROI > 300.
+
+    success(Movie) :-
+        roi(Movie, ROI),
+        ROI > 300.

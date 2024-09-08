@@ -94,8 +94,8 @@ df = pd.read_csv('../resources/dataset/Movie_dataset_features.csv', encoding='ut
 
 features = [
     'Runtime_Encoded', 'Director_Num_Movies', 'Writer_Num_Movies', 'Main_Actor_Num_Movies', 'Scaled_Standardized_Budget', 
-    'Decade', 'G', 'PG', 'PG-13', 'R', 'NC-17', 'Not Rated', 'Unrated', 'Action', 'Adventure', 'Animation', 'Comedy', 
-    'Crime', 'Drama', 'Fantasy', 'Horror', 'Mystery', 'Romance', 'Sci-Fi', 'Thriller', 'Western'
+    'Decade', 'G', 'PG', 'PG-13', 'R', 'NC-17', 'Not Rated', 'Unrated', 'Action', 'Adventure', 'Animation', 'Biography', 
+    'Comedy', 'Crime', 'Drama', 'Family', 'Fantasy', 'Horror', 'Mystery', 'Romance', 'Sci-Fi', 'Thriller', 'Western'
 ]
 clusters, centroids = define_cluster(df, features)
 
