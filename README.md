@@ -1,5 +1,5 @@
 # Movie Income Predictor
-Progetto per l'esame di Ingegneria della Conoscenza presso l'Università degli Studi di Bari "Aldo Moro", anno 2023/2024.
+Progetto per l'esame di Ingegneria della Conoscenza presso l'Università degli Studi di Bari "Aldo Moro", anno 2023/2024. La documentazione del progetto é visibile consultando il file `Movie_Income_Predictor.pdf`.
 
 ## Ragionamento logico e Prolog
 Per poter eseguire il codice di ragionamento logico e Prolog é sufficiente eseguire il seguente comando a partire dalla cartella `.\src` del progetto:
